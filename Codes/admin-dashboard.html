@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Sports Buddy</title>
+    <link rel="stylesheet" href="adminstyles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <!-- Left Section -->
+        <div class="left-section">
+            <h1>Sports Buddy</h1>
+            <div class="admin-container">
+                <p id="adminName">Admin Name</p>
+                <div class="admin-pill">Admin</div>
+            </div>
+            <div class="list-section">
+                <ul class="sidebar-list">
+                    <li class="sidebar-item" data-section="events">Events</li>
+                    <li class="sidebar-item" data-section="attending">Attending</li>
+                    <li class="sidebar-item" data-section="my-events">My Events</li>
+                    <li class="sidebar-item" data-section="sports">Sports Categories</li>
+                    <li class="sidebar-item" data-section="cities">Cities</li>
+                    <li class="sidebar-item" data-section="areas">Areas</li>
+                </ul>
+            </div>
+        </div>
+
+       <!-- Middle Section -->
+<div class="middle-section">
+    <div class="header-container">
+        <h2>Event Details</h2>
+        <button id="AddeventBtn">Add Event</button>
+    </div>
+
+    <!-- Existing Event Card -->
+    <div class="event-card">
+        <h2>Event Title</h2>
+        <span class="pill">DD/MM/YYYY & HH.MM AM/PM</span>
+        <p>Information about the event.</p>
+        <p class="location">
+            <strong>Location:</strong> <span id="eventLocation">New York</span>
+        </p>
+        <button class="attend-btn">Attend</button>
+    </div>
+
+    <!-- New Event Form -->
+    <div class="event-card new-event-form">
+        <input type="text" id="eventTitle" placeholder="Enter Event Title" class="event-title-input title-style">
+
+        <!-- Date & Time Input -->
+        <div class="pill datetime-picker" id="datetimePicker">
+            <input type="text" id="eventDateTimeDisplay" placeholder="DD/MM/YYYY & HH.MM AM/PM" readonly>
+        </div>
+
+        <!-- Hidden Input for Actual Date Selection -->
+        <input type="datetime-local" id="eventDateTime" class="event-date-input" style="display: none;">
+
+        <textarea id="eventDescription" placeholder="Enter Information............" class="event-description"></textarea>
+
+        <!-- Styled Location Input -->
+        <p class="location">
+            <strong>Location:</strong>
+            <input type="text" id="eventLocationInput" placeholder="Enter Location" class="event-location-input location-style">
+        </p>
+
+        <button id="publishEvent" class="publish-btn">Publish</button>
+    </div>
+</div> 
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <button id="logoutBtn">Logout</button>
+            <h2>Search</h2>
+            <input type="text" id="filterInput" placeholder="Search events...">
+            <h2>Filters</h2>
+        </div>
+
+    </div> <!-- Closes dashboard-container properly -->
+
+    <script defer type="module" src="admin-dashboard.js"></script>
+</body>
+</html>

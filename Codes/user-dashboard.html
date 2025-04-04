@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Sports Buddy</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Welcome to Sports Buddy</h1>
+    
+    <button id="logoutBtn">Logout</button>
+
+    <!-- Search & Filter -->
+    <h2>Find an Event</h2>
+    <input type="text" id="searchInput" placeholder="Search by name">
+    <select id="sportFilter">
+        <option value="">All Sports</option>
+        <option value="Football">Football</option>
+        <option value="Basketball">Basketball</option>
+        <option value="Tennis">Tennis</option>
+    </select>
+    <input type="date" id="dateFilter">
+    <button id="filterBtn">Filter</button>
+
+    <!-- Create an Event -->
+    <h2>Create an Event</h2>
+    <form id="eventForm">
+        <input type="text" id="eventName" placeholder="Event Name" required>
+        <input type="text" id="sportType" placeholder="Sport Type" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <input type="date" id="date" required>
+        <input type="time" id="time" required>
+        <button type="submit">Create Event</button>
+    </form>
+
+    <!-- My Events Section -->
+    <h2>My Events</h2>
+    <ul id="myEventsList"></ul>
+
+    <!-- Available Events -->
+    <h2>All Events</h2>
+    <ul id="eventList"></ul>
+
+    <script defer type="module" src="user-dashboard.js"></script>
+</body>
+</html>

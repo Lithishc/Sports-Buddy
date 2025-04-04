@@ -1,0 +1,228 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Full Page Gradient Background */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+   
+}
+
+/* Container Styling */
+.container {
+    display: flex;
+    width: 800px;
+    height: 500px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Left Section - Welcome Text */
+.left-section {
+    flex: 1;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.left-section h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.left-section p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Right Section - Login Form */
+.right-section {
+    flex: 1;
+    display: flex;
+    color: #f5f5f5; /* Softer White for better contrast */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Toggle Switch */
+.toggle-container {
+    display: flex;
+    width: 100%; /* Now matches input field width */
+    max-width: 300px; /* Ensures consistency with form */
+    background: #f0f0f0;
+    border-radius: 50px;
+    padding: 5px;
+    margin-bottom: 20px; /* Proper vertical spacing */
+    font-family: 'Poppins', sans-serif;
+}
+/* Adjust spacing between "Login" text and toggle */
+.right-section h2 {
+    font-size: 24px; /* Slightly larger for better readability */
+    font-weight: 600; /* Thicker than before for better visibility */
+    text-transform: uppercase; /* Maintains a premium look */
+    letter-spacing: 1.2px; /* Subtle spacing for a sleek feel */
+    color: #333; /* Keeps it professional */
+    text-align: center; /* Centers the text */
+    width: 100%; /* Ensures full width for proper alignment */
+    margin-bottom: 25px; /* Proper spacing from toggle */
+}
+
+/* Toggle Button Container */
+.toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+/* Toggle Buttons */
+.toggle-container button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    border-radius: 50px;
+}
+
+/* Active Button */
+.toggle-container button.active {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+/* Inactive Button */
+.toggle-container button:not(.active) {
+    color: gray;
+    transform: scale(1);
+}
+
+/* Hover Effect */
+.toggle-container button:hover {
+    transform: scale(1.05);
+}
+
+
+/* Login Form */
+#loginForm {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+#loginForm input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 30px;
+    background: #f0f0f0;
+    font-size: 14px;
+    outline: none;
+    text-indent: 10px;
+}
+
+#loginForm button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#loginForm button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Extra Links - Centered and Aligned */
+.extra-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 12px; /* Space from login button */
+    font-size: 14px;
+}
+
+/* Forgot Password Link */
+#forgotPassword {
+    color: #2575fc; /* Blue color */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#forgotPassword:hover {
+    text-decoration: underline;
+}
+
+/* Gray Horizontal Line */
+.divider {
+    width: 100%;
+    max-width: 300px; /* Matches input width */
+    height: 1px;
+    background: #ccc;
+    margin: 15px auto; /* Space after links */
+}
+
+/* Create New Account Button (Same as Login Button) */
+#createAccount {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #11998e, #38ef7d); /* Stronger Green Gradient */
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 10px; /* Space after divider */
+    transition: 0.3s;
+}
+#createAccount:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Error Message */
+#errorMessage {
+    color: red;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 5px; /* Spacing from other elements */
+}
+
+.admin-active {
+    transform: translateX(100%); /* Adjust to match button size */
+    transition: transform 0.3s ease-in-out;
+}

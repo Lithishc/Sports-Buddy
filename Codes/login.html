@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Buddy | Login</title>
+    <link rel="stylesheet" href="loginstyles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Side -->
+        <div class="left-section">
+            <h1>Welcome to Sports Buddy</h1>
+            <p>Find and organize sports events near you with ease.</p>
+        </div>
+
+        <!-- Right Side (Login Form) -->
+        <div class="right-section">
+            <h2>Access Your Sports Buddy</h2>
+            <div class="toggle-container">
+                <button id="toggleUser" class="active">User</button>
+                <button id="toggleAdmin">Admin</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Enter email" required>
+                <input type="password" id="password" placeholder="Enter password" required>
+                <button type="submit">Login</button>
+            
+                <!-- Extra Links (Forgot Password) -->
+                <div class="extra-links">
+                    <a href="forgot-password.html" id="forgotPassword">Forgot Password?</a>
+                </div>
+            
+                <!-- Gray Horizontal Line -->
+                <div class="divider"></div>
+            
+                <!-- Create New Account Button -->
+                <a href="register.html" id="createAccount">Create New Account</a>
+            
+                <p id="errorMessage"></p>
+            </form>
+            
+        </div>
+    </div>
+
+    <script defer type="module" src="loginscript.js"></script>
+</body>
+</html>
