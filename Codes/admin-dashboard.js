@@ -148,69 +148,84 @@ document.addEventListener("DOMContentLoaded", () => {
             const eventCard = document.createElement("div");
             eventCard.classList.add("event-card");
     
+            const isCreator = user && event.createdBy === user.uid;
             const status = attendanceMap[event.id]?.status;
             const isAttending = status === "attending";
     
-            const attendButton = document.createElement("button");
-            attendButton.classList.add("attend-btn");
-            attendButton.textContent = isAttending ? "Drop Out" : "Join Event";
+            if (isCreator) {
+                const deleteButton = document.createElement("button");
+                deleteButton.classList.add("delete-btn");
+                deleteButton.textContent = "Delete";
+                deleteButton.style.position = "absolute";
+                deleteButton.style.top = "10px";
+                deleteButton.style.right = "10px";
     
-            attendButton.addEventListener("click", () =>
-                toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
-            );
+                deleteButton.addEventListener("click", async () => {
+                    if (confirm("Are you sure you want to delete this event?")) {
+                        try {
+                            await deleteDoc(doc(db, "events", event.id));
+                            alert("Event deleted successfully!");
+                            fetchEvents();
+                        } catch (error) {
+                            console.error("Error deleting event:", error);
+                            alert("Failed to delete event.");
+                        }
+                    }
+                });
+    
+                eventCard.appendChild(deleteButton);
+            }
+    
+            const actionButton = document.createElement("button");
+            actionButton.classList.add("attend-btn");
+    
+            if (isCreator) {
+                actionButton.textContent = "Edit";
+                actionButton.addEventListener("click", () => showEditEventForm(event));
+            } else {
+                actionButton.textContent = isAttending ? "Drop Out" : "Join Event";
+                actionButton.addEventListener("click", () =>
+                    toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
+                );
+            }
     
             eventCard.innerHTML = `
                 <h2>${event.title}</h2>
                 <span class="pill">${event.date} @ ${event.time}</span>
+                <p class="category"><strong>Sport Category:</strong> ${event.sportCategory || "N/A"}</p>
                 <p>${event.description}</p>
                 <p class="location"><strong>Location:</strong> ${event.location}</p>
+                
             `;
     
-            eventCard.appendChild(attendButton);
+            eventCard.appendChild(actionButton);
             wrapper.appendChild(eventCard);
         });
     }
-    
-    
-    
 
-    // ✅ **Show "Add Event" Form**
-    function showAddEventForm() {
-        if (document.querySelector(".new-event")) return; // Prevent duplicate forms
+// ✅ **Show "Edit Event" Form**
+function showEditEventForm(event) {
+    const eventCard = document.querySelector(`.event-card[data-id="${event.id}"]`);
+    if (!eventCard) return;
 
-        const formHTML = `
-            <div class="event-card new-event" style="opacity: 0; transform: scale(0.9);">
-                <input type="text" id="eventTitle" class="event-title-input" placeholder="Enter event title">
-                <span class="pill">
-                    <input type="datetime-local" id="eventDateTime" class="event-date">
-                </span>
-                <textarea id="eventDescription" class="event-description" placeholder="Enter event details..."></textarea>
-                <p class="location">
-                    <strong>Location:</strong> <input type="text" id="eventLocationInput" class="event-location" placeholder="Enter location">
-                </p>
-                <button class="publish-btn">Publish</button>
-            </div>
-        `;
+    eventCard.innerHTML = `
+        <input type="text" id="editEventTitle" class="event-title-input" value="${event.title}">
+        <span class="pill">
+            <input type="datetime-local" id="editEventDateTime" class="event-date" value="${event.date}T${event.time}">
+        </span>
+        <textarea id="editEventDescription" class="event-description">${event.description}</textarea>
+        <p class="location">
+            <strong>Location:</strong> <input type="text" id="editEventLocation" class="event-location" value="${event.location}">
+        </p>
+        <button class="save-btn">Save</button>
+        <button class="cancel-btn">Cancel</button>
+    `;
 
-        document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
-
-        // Animate form appearance
-        setTimeout(() => {
-            document.querySelector(".new-event").style.opacity = "1";
-            document.querySelector(".new-event").style.transform = "scale(1)";
-        }, 100);
-
-        // Add event listener for "Publish"
-        document.querySelector(".publish-btn").addEventListener("click", publishEvent);
-    }
-    
-
-    // ✅ **Publish Event to Firestore**
-    async function publishEvent() {
-        const title = document.getElementById("eventTitle").value.trim();
-        const dateTime = document.getElementById("eventDateTime").value;
-        const description = document.getElementById("eventDescription").value.trim();
-        const location = document.getElementById("eventLocationInput").value.trim();
+    eventCard.querySelector(".save-btn").addEventListener("click", async () => {
+        const title = document.getElementById("editEventTitle").value.trim();
+        const dateTime = document.getElementById("editEventDateTime").value;
+        const description = document.getElementById("editEventDescription").value.trim();
+        const location = document.getElementById("editEventLocation").value.trim();
 
         if (!title || !dateTime || !description || !location) {
             alert("All fields are required!");
@@ -218,28 +233,142 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
+            const [date, time] = dateTime.split("T");
+            await updateDoc(doc(db, "events", event.id), {
+                title,
+                date: date.split("-").reverse().join("/"),
+                time,
+                location,
+                description
+            });
+
+            alert("Event updated successfully!");
+            fetchEvents();
+        } catch (error) {
+            console.error("Error updating event:", error);
+            alert("Failed to update event.");
+        }
+    });
+
+    eventCard.querySelector(".cancel-btn").addEventListener("click", () => {
+        fetchEvents();
+    });
+}
+    
+    
+    
+
+    // ✅ **Show "Add Event" Form**
+    async function showAddEventForm() {
+        if (document.querySelector(".new-event")) return; // Prevent duplicate forms
+    
+        // Fetch areas, cities, and sports categories from Firestore
+        const areas = [];
+        const cities = [];
+        const sportsCategories = [];
+        const areaSnapshot = await getDocs(collection(db, "areas"));
+        const citySnapshot = await getDocs(collection(db, "cities"));
+        const categorySnapshot = await getDocs(collection(db, "sports_categories"));
+    
+        areaSnapshot.forEach(docSnap => areas.push(docSnap.data().name));
+        citySnapshot.forEach(docSnap => cities.push(docSnap.data().name));
+        categorySnapshot.forEach(docSnap => sportsCategories.push(docSnap.data().name));
+    
+        const formHTML = `
+            <div class="event-card new-event" style="opacity: 0; transform: scale(0.9);">
+                <input type="text" id="eventTitle" class="event-title-input" placeholder="Enter event title">
+                <span class="pill">
+                    <input type="datetime-local" id="eventDateTime" class="event-date">
+                </span>
+                <p class="category">
+                    <strong>Sport Category:</strong>
+                    <select id="sportCategoryInput" class="event-category">
+                        <option value="" disabled selected>Select a category</option>
+                        ${sportsCategories.map(category => `<option value="${category}">${category}</option>`).join("")}
+                    </select>
+                </p>
+                <textarea id="eventDescription" class="event-description" placeholder="Enter event details..."></textarea>
+                <p class="location">
+                    <strong>Location:</strong>
+                    <input type="text" id="eventLocationInput" class="event-location" placeholder="Enter location">
+                    <select id="areaDropdown" class="event-area">
+                        <option value="" disabled selected>Select Area</option>
+                        ${areas.map(area => `<option value="${area}">${area}</option>`).join("")}
+                    </select>
+                    <select id="cityDropdown" class="event-city">
+                        <option value="" disabled selected>Select City</option>
+                        ${cities.map(city => `<option value="${city}">${city}</option>`).join("")}
+                    </select>
+                </p>
+                <button class="publish-btn">Publish</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        `;
+    
+        document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
+    
+        // Animate form appearance
+        setTimeout(() => {
+            document.querySelector(".new-event").style.opacity = "1";
+            document.querySelector(".new-event").style.transform = "scale(1)";
+        }, 100);
+    
+        // Add event listeners for dropdowns
+        document.getElementById("areaDropdown").addEventListener("change", () => {
+            const locationInput = document.getElementById("eventLocationInput");
+            const selectedArea = document.getElementById("areaDropdown").value;
+            locationInput.value = `${locationInput.value.split(",")[0].trim()}, ${selectedArea}`;
+        });
+    
+        document.getElementById("cityDropdown").addEventListener("change", () => {
+            const locationInput = document.getElementById("eventLocationInput");
+            const selectedCity = document.getElementById("cityDropdown").value;
+            const parts = locationInput.value.split(",");
+            locationInput.value = `${parts[0].trim()}, ${parts[1]?.trim() || ""}, ${selectedCity}`.replace(/,\s*,/g, ",");
+        });
+    
+        // Add event listeners for buttons
+        document.querySelector(".publish-btn").addEventListener("click", publishEvent);
+        document.querySelector(".cancel-btn").addEventListener("click", fetchEvents);
+    }
+
+    // ✅ **Publish Event to Firestore**
+    async function publishEvent() {
+        const title = document.getElementById("eventTitle").value.trim();
+        const dateTime = document.getElementById("eventDateTime").value;
+        const description = document.getElementById("eventDescription").value.trim();
+        const location = document.getElementById("eventLocationInput").value.trim();
+        const sportCategory = document.getElementById("sportCategoryInput").value;
+    
+        if (!title || !dateTime || !description || !location || !sportCategory) {
+            alert("All fields are required!");
+            return;
+        }
+    
+        try {
             const user = auth.currentUser;
             if (!user) {
                 alert("You must be logged in to add an event.");
                 return;
             }
-
+    
             const userDoc = await getDoc(doc(db, "users", user.uid));
             const userName = userDoc.exists() ? userDoc.data().name : "Unknown";
-
+    
             const [date, time] = dateTime.split("T");
-
+    
             await addDoc(collection(db, "events"), {
                 title,
                 date: date.split("-").reverse().join("/"),
                 time,
                 location,
                 description,
+                sportCategory,
                 createdBy: user.uid,
                 creatorName: userName,
                 timestamp: serverTimestamp()
             });
-
+    
             alert("Event added successfully!");
             fetchEvents();
         } catch (error) {

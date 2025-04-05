@@ -209,12 +209,12 @@ body {
     right: 20px; /* Align to the right of the card */
     background: rgba(73, 194, 246, 0.174); /* Glassmorphism effect */
     color: #333; /* Text color */
-    padding: 5px 15px; /* Padding for the button */
+    padding: 10px 15px; /* Padding for the button */
     border: none; /* Remove default border */
     border-radius: 50px; /* Pill shape */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     backdrop-filter: blur(10px); /* Glass effect */
-    font-size: 24px; /* Font size for the button text */
+    font-size: 22px; /* Font size for the button text */
     font-weight: 600; /* Slightly bold text */
     cursor: pointer; /* Pointer cursor on hover */
     transition: all 0.3s ease; /* Smooth hover effect */
@@ -224,16 +224,19 @@ body {
     background: rgba(255, 255, 255, 0.9); /* Slightly brighter on hover */
     box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
 }
+
+
+/* New Event Form */
 .new-event-form {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 20px;
+    flex-direction: column; /* Stack elements vertically */
+    gap: 20px; /* Add spacing between elements */
+    padding: 30px 20px 100px;
     border-radius: 15px;
     background: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
-
 .event-title-input {
     font-size: 24px;
     font-weight: bold;
@@ -244,16 +247,17 @@ body {
     margin-bottom: 5px;
 }
 
+
 .event-date-input {
-    font-size: 16px;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    background: rgba(255, 255, 255, 0.8);
-    outline: none;
-    width: 100%;
-    text-align: center;
-    transition: border-color 0.3s ease;
+    background-color: #f0f0f0; /* light grey */
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  max-width: 250px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .event-date-input:focus {
@@ -266,52 +270,90 @@ body {
     cursor: pointer;
 }
 
+/* Event Description */
 .event-description {
     background: #f0f0f0;
     padding: 10px;
     border-radius: 8px;
     border: none;
+    margin-bottom: 20px; /* Add spacing below the description */
     outline: none;
     resize: none;
+    font-size: 14px;
+    color: #333;
+    min-height: 70px; /* Set a minimum height for the description box */
 }
 
-/* Location Label */
-.location-input {
-    font-size: 16px;
-    padding: 10px 15px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background: #f0f0f0; /* Light grey background */
-    outline: none;
-    width: 100%;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+/* Location, Area, and City Section */
+.location {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    gap: 15px; /* Add spacing between inputs */
+    align-items: center; /* Align inputs vertically */
+    margin-bottom: 20px; /* Add spacing below the location section */
 }
 
-.location-input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+/* Inputs for Location, Area, and City */
+.event-location,
+.event-area,
+.event-city ,
+#sportCategoryInput{
+    flex: 1; /* Make inputs take equal space */
+    min-width: 150px; /* Ensure a minimum width for smaller screens */
+    padding: 5px 5px; /* Add padding inside inputs */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 10px; /* Rounded corners */
+    background: #f0f0f0; /* Light gray background */
+    font-size: 14px; /* Font size for input text */
+    outline: none; /* Remove default outline */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effect */
 }
 
+.event-location:focus,
+.event-area:focus,
+.event-city:focus ,
+#sportCategoryInput:focus {
+    border-color: #007bff; /* Blue border on focus */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Subtle shadow on focus */
+}
+
+/* Publish Button */
 .publish-btn {
-    position: absolute; /* Position the button */
-    bottom: 10px; /* Align to the bottom of the card */
-    right: 20px; /* Align to the right of the card */
-    background: rgba(73, 194, 246, 0.174); /* Glassmorphism effect */
-    color: #333; /* Text color */
-    padding: 5px 15px; /* Padding for the button */
-    border: none; /* Remove default border */
-    border-radius: 50px; /* Pill shape */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    backdrop-filter: blur(10px); /* Glass effect */
-    font-size: 24px; /* Font size for the button text */
-    font-weight: 600; /* Slightly bold text */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: all 0.3s ease; /* Smooth hover effect */
+    align-self: flex-end; /* Align the button to the right */
+    background: rgba(73, 194, 246, 0.174);
+    color: #333;
+    padding: 12px 25px; /* Adjust padding for better appearance */
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    font-size: 22px; /* Adjust font size */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+
 .publish-btn:hover {
-    background: rgba(255, 255, 255, 0.9); /* Slightly brighter on hover */
-    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
 }
+.cancel-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    font-size: 16px;
+    padding: 10px 10px;
+    border-radius: 20px;
+    font-weight: 550;
+    cursor: pointer;
+  }
+  .cancel-btn:hover {
+    background: rgb(235, 54, 54);
+}
+  
 
 .letter-heading {
     font-weight: bold;
