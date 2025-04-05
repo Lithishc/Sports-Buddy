@@ -476,7 +476,6 @@ body {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Stack items vertically */
-    gap: 15px; /* Add spacing between items */
 }
 
 #logoutBtn {
@@ -513,6 +512,88 @@ body {
 #filterInput:focus {
     border-color: #007bff; /* Blue border on focus */
     outline: none; /* Remove default outline */
+}
+
+/* Filters Section */
+.filter-dropdown {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: border-color 0.3s;
+}
+
+.filter-dropdown:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.filter-buttons {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center the buttons horizontally */
+    align-items: center; /* Align the buttons vertically */
+    gap: 15px; /* Add spacing between the buttons */
+    margin-top: 10px; /* Add spacing above the buttons */
+}
+
+.apply-filters-btn,
+.reset-filters-btn {
+    flex: 0 0 auto; /* Prevent buttons from stretching */
+    text-align: center; /* Center the text inside the buttons */
+    padding: 10px 20px; /* Adjust padding for better appearance */
+    font-size: 14px; /* Slightly smaller font size for a refined look */
+    font-weight: 600; /* Bold text for emphasis */
+    border-radius: 50px; /* Pill-shaped buttons */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    border: none; /* Remove the black border */
+}
+
+.filter-pill {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-pill:hover {
+    background-color: #d6d6d6;
+}
+
+.apply-filters-btn {
+    background: rgba(73, 194, 246, 0.2); /* Light blue background */
+    color: #333; /* Dark text color */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.apply-filters-btn:hover {
+    background: rgba(73, 194, 246, 0.4); /* Darker blue on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+.reset-filters-btn {
+    background: rgba(255, 77, 79, 0.2); /* Light red background */
+    color: #333; /* Dark text color */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.reset-filters-btn:hover {
+    background: rgba(255, 77, 79, 0.4); /* Darker red on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
 }
 
 

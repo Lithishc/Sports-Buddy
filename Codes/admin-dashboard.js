@@ -130,6 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ **Render Events & Add "Add Event" Button**
     function renderEvents() {
+        if (currentSection !== "events") return; // Ensure this function only runs for the "events" section
+    
         middleSection.innerHTML = `
             <div class="header-container">
                 <h2>Events</h2>
@@ -139,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     
         document.getElementById("AddeventBtn").addEventListener("click", showAddEventForm);
-        updateEventList();
+        updateEventList(events, "eventsWrapper"); // Update the event list for the "events" section
     }
     
 
@@ -498,13 +500,14 @@ function showEditEventForm(event) {
     
         switch (section) {
             case "events":
-                fetchEvents();
+                fetchEvents(); // Fetch all events
                 break;
             case "attending":
-                renderAttendingEvents();
+                renderAttendingEvents(); // Fetch attending and not attending events
                 break;
             case "my-events":
-                fetchEvents(true);
+                fetchEvents(true); // Fetch only the user's events
+                renderMyEvents(); // Render the My Events section
                 break;
             case "sports":
                 renderAdminList("Sports Categories", "sports_categories");
@@ -516,12 +519,21 @@ function showEditEventForm(event) {
                 renderAdminList("Areas", "areas");
                 break;
             default:
-                document.getElementById("eventsWrapper").innerHTML = `<h2>Coming Soon</h2>`;
+                middleSection.innerHTML = `<h2>Coming Soon</h2>`;
         }
     }
     
     
+    function renderMyEvents() {
+        middleSection.innerHTML = `
+            <div class="header-container">
+                <h2>My Events</h2>
+            </div>
+            <div id="myEventsWrapper"></div>
+        `;
     
+        updateEventList(events, "myEventsWrapper"); // Update the event list with only the user's events
+    }
 
 
     // Handle sidebar navigation clicks
@@ -707,6 +719,196 @@ async function toggleAttendance(eventId, isAttending, docId) {
             });
         }
     });
+
+   
+
+
+//right section search and filter code
+document.getElementById("filterInput").addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase();
+
+    let filteredData = [];
+
+    switch (currentSection) {
+        case "events":
+            filteredData = events.filter(event => {
+                return (
+                    (event.title || "").toLowerCase().includes(query) ||
+                    (event.date || "").toLowerCase().includes(query) ||
+                    (event.time || "").toLowerCase().includes(query) ||
+                    (event.location || "").toLowerCase().includes(query) ||
+                    (event.area || "").toLowerCase().includes(query) ||
+                    (event.city || "").toLowerCase().includes(query) ||
+                    (event.skillLevel || "").toLowerCase().includes(query) ||
+                    (event.sportCategory || "").toLowerCase().includes(query)
+                );
+            });
+            updateEventList(filteredData, "eventsWrapper");
+            break;
+
+        case "attending":
+            const attendingEvents = events.filter(event => event.status === "attending");
+            filteredData = attendingEvents.filter(event => {
+                return (
+                    (event.title || "").toLowerCase().includes(query) ||
+                    (event.date || "").toLowerCase().includes(query) ||
+                    (event.time || "").toLowerCase().includes(query) ||
+                    (event.location || "").toLowerCase().includes(query) ||
+                    (event.area || "").toLowerCase().includes(query) ||
+                    (event.city || "").toLowerCase().includes(query) ||
+                    (event.skillLevel || "").toLowerCase().includes(query) ||
+                    (event.sportCategory || "").toLowerCase().includes(query)
+                );
+            });
+            updateEventList(filteredData, "attendingWrapper");
+            break;
+
+        case "sports":
+        case "cities":
+        case "areas":
+            const adminListItems = Array.from(document.querySelectorAll(".admin-item span"));
+            adminListItems.forEach(item => {
+                const parent = item.parentElement;
+                if (item.textContent.toLowerCase().includes(query)) {
+                    parent.style.display = "block";
+                } else {
+                    parent.style.display = "none";
+                }
+            });
+            break;
+
+        default:
+            console.log("Search is not supported for this section.");
+    }
+});
+
+// Populate filters on page load
+async function populateFilters() {
+    const skillLevels = ["Beginner", "Intermediate", "Advanced"];
+    const sportsCategories = [];
+    const cities = [];
+    const areas = [];
+
+    // Fetch dropdown data from Firestore
+    const categorySnapshot = await getDocs(collection(db, "sports_categories"));
+    const citySnapshot = await getDocs(collection(db, "cities"));
+    const areaSnapshot = await getDocs(collection(db, "areas"));
+
+    categorySnapshot.forEach(docSnap => sportsCategories.push(docSnap.data().name));
+    citySnapshot.forEach(docSnap => cities.push(docSnap.data().name));
+    areaSnapshot.forEach(docSnap => areas.push(docSnap.data().name));
+
+    // Populate dropdowns
+    populateDropdown("skillFilter", skillLevels);
+    populateDropdown("sportsCategoryFilter", sportsCategories);
+    populateDropdown("cityFilter", cities);
+    populateDropdown("areaFilter", areas);
+}
+
+// Helper function to populate dropdowns
+function populateDropdown(dropdownId, options) {
+    const dropdown = document.getElementById(dropdownId);
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        dropdown.appendChild(opt);
+    });
+}
+
+// Handle active filters
+function updateActiveFilters() {
+    const activeFiltersContainer = document.getElementById("activeFilters");
+    activeFiltersContainer.innerHTML = ""; // Clear existing filters
+
+    const filters = {
+        skill: document.getElementById("skillFilter").value,
+        sportsCategory: document.getElementById("sportsCategoryFilter").value,
+        city: document.getElementById("cityFilter").value,
+        area: document.getElementById("areaFilter").value
+    };
+
+    Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+            const pill = document.createElement("div");
+            pill.classList.add("filter-pill");
+            pill.textContent = filters[key];
+            pill.addEventListener("click", () => {
+                document.getElementById(`${key}Filter`).value = ""; // Reset filter
+                updateActiveFilters(); // Update active filters
+            });
+            activeFiltersContainer.appendChild(pill);
+        }
+    });
+}
+
+// Apply filters
+document.getElementById("applyFiltersBtn").addEventListener("click", () => {
+    const skill = document.getElementById("skillFilter").value;
+    const sportsCategory = document.getElementById("sportsCategoryFilter").value;
+    const city = document.getElementById("cityFilter").value;
+    const area = document.getElementById("areaFilter").value;
+
+    if (currentSection === "attending") {
+        // Filter Attending Events
+        const attendingEvents = events.filter(event => event.status === "attending");
+        const filteredAttending = attendingEvents.filter(event => {
+            return (
+                (!skill || event.skillLevel === skill) &&
+                (!sportsCategory || event.sportCategory === sportsCategory) &&
+                (!city || event.city === city) &&
+                (!area || event.area === area)
+            );
+        });
+
+        // Filter Not Attending Events
+        const notAttendingEvents = events.filter(event => event.status === "not attending");
+        const filteredNotAttending = notAttendingEvents.filter(event => {
+            return (
+                (!skill || event.skillLevel === skill) &&
+                (!sportsCategory || event.sportCategory === sportsCategory) &&
+                (!city || event.city === city) &&
+                (!area || event.area === area)
+            );
+        });
+
+        // Update both sections
+        updateEventList(filteredAttending, "attendingWrapper");
+        updateEventList(filteredNotAttending, "canceledWrapper");
+    } else {
+        // Filter Events for other sections
+        const filteredEvents = events.filter(event => {
+            return (
+                (!skill || event.skillLevel === skill) &&
+                (!sportsCategory || event.sportCategory === sportsCategory) &&
+                (!city || event.city === city) &&
+                (!area || event.area === area)
+            );
+        });
+
+        updateEventList(filteredEvents, "eventsWrapper");
+    }
+});
+
+// Populate filters on page load
+populateFilters();
+
+// Reset filters
+document.getElementById("resetFiltersBtn").addEventListener("click", () => {
+    // Reset all dropdowns to their default value
+    document.getElementById("skillFilter").value = "";
+    document.getElementById("sportsCategoryFilter").value = "";
+    document.getElementById("cityFilter").value = "";
+    document.getElementById("areaFilter").value = "";
+
+    // Clear active filters
+    updateActiveFilters();
+
+    // Reset the event list to show all events
+    updateEventList(events, "eventsWrapper");
+});
+
+
 
     // ✅ **Fetch Events on Load**
     fetchEvents();

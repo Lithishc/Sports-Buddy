@@ -38,7 +38,9 @@
     <!-- Existing Event Card -->
     <div class="event-card">
         <h2>Event Title</h2>
-        <span class="pill">DD/MM/YYYY & HH.MM AM/PM</span>
+        <div class="pill datetime-picker" id="datetimePicker">
+            <input type="text" id="eventDateTimeDisplay" placeholder="DD/MM/YYYY & HH.MM AM/PM" readonly>
+        </div>
         <p>Information about the event.</p>
         <p class="location">
             <strong>Location:</strong> <span id="eventLocation">New York</span>
@@ -81,6 +83,25 @@
             <h2>Search</h2>
             <input type="text" id="filterInput" placeholder="Search events...">
             <h2>Filters</h2>
+            <div id="filtersContainer">
+                <select id="skillFilter" class="filter-dropdown">
+                    <option value="">Select Skill Level</option>
+                </select>
+                <select id="sportsCategoryFilter" class="filter-dropdown">
+                    <option value="">Select Sports Category</option>
+                </select>
+                <select id="cityFilter" class="filter-dropdown">
+                    <option value="">Select City</option>
+                </select>
+                <select id="areaFilter" class="filter-dropdown">
+                    <option value="">Select Area</option>
+                </select>
+                <div id="activeFilters" class="active-filters"></div>
+                <div class="filter-buttons">
+                    <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
+                    <button id="resetFiltersBtn" class="reset-filters-btn">Reset Filters</button>
+                </div>
+            </div>
         </div>
 
     </div> <!-- Closes dashboard-container properly -->
