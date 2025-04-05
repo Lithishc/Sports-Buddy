@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, getDocs, setDoc, doc, getDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { auth } from "./firebase-config.js";
 
 // Initialize Firestore
@@ -11,9 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logoutBtn");
     const adminNameElement = document.getElementById("adminName");
     const middleSection = document.querySelector(".middle-section");
-    const sidebarItems = document.querySelectorAll(".sidebar-item");
     let events = [];
-
+    let currentSection = "events"; // default section
 
 
     // ✅ **Fetch Admin Name**
@@ -62,6 +61,63 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
+    async function renderAttendingEvents() {
+        const user = auth.currentUser;
+        if (!user) return;
+    
+        const attendingQuery = query(
+            collection(db, "attendees"),
+            where("userId", "==", user.uid),
+            where("status", "==", "attending")
+        );
+        const canceledQuery = query(
+            collection(db, "attendees"),
+            where("userId", "==", user.uid),
+            where("status", "==", "not attending")
+        );
+    
+        const [attendingSnap, canceledSnap] = await Promise.all([
+            getDocs(attendingQuery),
+            getDocs(canceledQuery)
+        ]);
+    
+        const attendingIds = attendingSnap.docs.map(doc => doc.data().eventId);
+        const canceledIds = canceledSnap.docs.map(doc => doc.data().eventId);
+    
+        const allEventIds = [...attendingIds, ...canceledIds];
+        const eventDocs = await Promise.all(
+            allEventIds.map(id => getDoc(doc(db, "events", id)))
+        );
+    
+        const idToEvent = {};
+        eventDocs.forEach(doc => {
+            if (doc.exists()) {
+                idToEvent[doc.id] = { id: doc.id, ...doc.data() };
+            }
+        });
+    
+        const attendingEvents = attendingIds.map(id => idToEvent[id]).filter(Boolean);
+        const canceledEvents = canceledIds.map(id => idToEvent[id]).filter(Boolean);
+    
+        middleSection.innerHTML = `
+            <div class="header-container">
+                <h2>Attending Events</h2>
+            </div>
+            <div id="attendingWrapper"></div>
+    
+            <div class="header-container" style="margin-top: 40px;">
+                <h2>Cancelled Events(Not Attending)</h2>
+            </div>
+            <div id="canceledWrapper"></div>
+        `;
+    
+        // Reuse updateEventList but pass different containers
+        updateEventList(attendingEvents, "attendingWrapper");
+        updateEventList(canceledEvents, "canceledWrapper");
+    }
+    
+    
+    
     
 
 
@@ -81,23 +137,42 @@ document.addEventListener("DOMContentLoaded", () => {
     
 
     // ✅ **Update Event List**
-    function updateEventList() {
-        const eventsWrapper = document.getElementById("eventsWrapper");
-        eventsWrapper.innerHTML = "";
-
-        events.forEach(event => {
+    async function updateEventList(eventList = events, containerId = "eventsWrapper") {
+        const wrapper = document.getElementById(containerId);
+        wrapper.innerHTML = "";
+    
+        const user = auth.currentUser;
+        const attendanceMap = user ? await getUserAttendanceMap(user.uid) : {};
+    
+        eventList.forEach(event => {
             const eventCard = document.createElement("div");
             eventCard.classList.add("event-card");
+    
+            const status = attendanceMap[event.id]?.status;
+            const isAttending = status === "attending";
+    
+            const attendButton = document.createElement("button");
+            attendButton.classList.add("attend-btn");
+            attendButton.textContent = isAttending ? "Cancel Attendance" : "Attend";
+    
+            attendButton.addEventListener("click", () =>
+                toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
+            );
+    
             eventCard.innerHTML = `
                 <h2>${event.title}</h2>
                 <span class="pill">${event.date} @ ${event.time}</span>
                 <p>${event.description}</p>
                 <p class="location"><strong>Location:</strong> ${event.location}</p>
-                <button class="attend-btn">Attend</button>
             `;
-            eventsWrapper.appendChild(eventCard);
+    
+            eventCard.appendChild(attendButton);
+            wrapper.appendChild(eventCard);
         });
     }
+    
+    
+    
 
     // ✅ **Show "Add Event" Form**
     function showAddEventForm() {
@@ -174,15 +249,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function switchSection(section) {
+        currentSection = section; // ✅ Track current section
+    
         switch (section) {
             case "events":
-                fetchEvents(); // Show all events
+                fetchEvents();
                 break;
             case "attending":
-                middleSection.innerHTML = "<h2>Attending Events</h2><p>Attending Events</p>";
+                renderAttendingEvents();
                 break;
             case "my-events":
-                fetchEvents(true); // Only show events created by the logged-in user
+                fetchEvents(true);
                 break;
             case "sports":
                 renderAdminList("Sports Categories", "sports_categories");
@@ -238,15 +315,27 @@ async function renderAdminList(title, collectionName) {
     const listContainer = document.getElementById("adminList");
     listContainer.innerHTML = "";
 
-    items.forEach(item => {
-        const li = document.createElement("li");
-        li.classList.add("admin-item");
-        li.innerHTML = `
-            <span>${item.name}</span>
-            <button class="delete-btn" data-id="${item.id}" data-collection="${collectionName}">Delete</button>
-        `;
-        listContainer.appendChild(li);
-    });
+    let currentLetter = "";
+items.forEach(item => {
+    const firstLetter = item.name.charAt(0).toUpperCase();
+
+    if (firstLetter !== currentLetter) {
+        currentLetter = firstLetter;
+        const letterHeader = document.createElement("li");
+        letterHeader.classList.add("letter-heading");
+        letterHeader.textContent = currentLetter;
+        listContainer.appendChild(letterHeader);
+    }
+
+    const li = document.createElement("li");
+    li.classList.add("admin-item");
+    li.innerHTML = `
+        <span>${item.name}</span>
+        <button class="delete-btn" data-id="${item.id}" data-collection="${collectionName}">Delete</button>
+    `;
+    listContainer.appendChild(li);
+});
+
 
     // ✅ Handle delete functionality
     listContainer.addEventListener("click", async (e) => {
@@ -306,6 +395,58 @@ function addItem(collectionName) {
         }).catch(err => {
             console.error("Add item error:", err);
         });
+    }
+}
+
+
+async function getUserAttendanceMap(userId) {
+    const q = query(collection(db, "attendees"), where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+    const map = {};
+    snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        map[data.eventId] = {
+            status: data.status,
+            docId: docSnap.id
+        };
+    });
+    return map;
+}
+
+
+async function toggleAttendance(eventId, isAttending, docId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        const attendanceRef = docId
+            ? doc(db, "attendees", docId)
+            : doc(collection(db, "attendees"));
+
+        if (isAttending) {
+            await updateDoc(attendanceRef, { status: "not attending" });
+        } else {
+            await setDoc(attendanceRef, {
+                userId: user.uid,
+                eventId,
+                status: "attending"
+            });
+        }
+
+        // ✅ Only refresh the current section
+        switch (currentSection) {
+            case "events":
+                fetchEvents();
+                break;
+            case "attending":
+                renderAttendingEvents();
+                break;
+            case "my-events":
+                fetchEvents(true);
+                break;
+        }
+    } catch (error) {
+        console.error("Error updating attendance:", error);
     }
 }
 
