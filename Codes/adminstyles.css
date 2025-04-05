@@ -425,6 +425,25 @@ body {
 .delete-btn:hover ,#cancelAddBtn:hover {
     background: #e60000;
 }
+/* Event Card Delete Button */
+.event-delete-btn {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.event-delete-btn:hover {
+    background: #e60000;
+}
 
 #addBtn {
     background: rgba(255, 255, 255, 0.7);
@@ -461,7 +480,7 @@ body {
 }
 
 #logoutBtn {
-    background-color: #d9534f; /* Red background for logout */
+    background-color: #ea2d26; /* Red background for logout */
     color: white; /* White text color */
     padding: 10px 20px; /* Padding for the button */
     border: none; /* Remove default border */

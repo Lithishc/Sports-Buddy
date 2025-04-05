@@ -1,4 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, getDocs, setDoc, doc, getDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { auth } from "./firebase-config.js";
@@ -147,33 +146,24 @@ document.addEventListener("DOMContentLoaded", () => {
         eventList.forEach(event => {
             const eventCard = document.createElement("div");
             eventCard.classList.add("event-card");
+            eventCard.style.position = "relative"; // Needed for absolute positioning
     
             const isCreator = user && event.createdBy === user.uid;
             const status = attendanceMap[event.id]?.status;
             const isAttending = status === "attending";
     
+            // Add Delete Button for Event Creator
             if (isCreator) {
+                console.log(`Adding delete button for event: ${event.title}`);
                 const deleteButton = document.createElement("button");
-                deleteButton.classList.add("delete-btn");
+                deleteButton.classList.add("event-delete-btn");
                 deleteButton.textContent = "Delete";
-                deleteButton.style.position = "absolute";
-                deleteButton.style.top = "10px";
-                deleteButton.style.right = "10px";
     
-                deleteButton.addEventListener("click", async () => {
-                    if (confirm("Are you sure you want to delete this event?")) {
-                        try {
-                            await deleteDoc(doc(db, "events", event.id));
-                            alert("Event deleted successfully!");
-                            fetchEvents();
-                        } catch (error) {
-                            console.error("Error deleting event:", error);
-                            alert("Failed to delete event.");
-                        }
-                    }
-                });
+                deleteButton.setAttribute("data-id", event.id);
+                deleteButton.setAttribute("data-title", event.title);
     
                 eventCard.appendChild(deleteButton);
+                console.log(`Delete button added for event: ${event.title}`);
             }
     
             const actionButton = document.createElement("button");
@@ -189,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
     
-            eventCard.innerHTML = `
+            eventCard.innerHTML += `
                 <h2>${event.title}</h2>
                 <span class="pill">${event.date} @ ${event.time}</span>
                 <div class="category-skill">
@@ -203,7 +193,27 @@ document.addEventListener("DOMContentLoaded", () => {
             eventCard.appendChild(actionButton);
             wrapper.appendChild(eventCard);
         });
+    
+        // Attach event listener to the wrapper for delete functionality
+        wrapper.addEventListener("click", async (e) => {
+            if (e.target.classList.contains("event-delete-btn")) {
+                const eventId = e.target.getAttribute("data-id");
+                const eventTitle = e.target.getAttribute("data-title");
+                console.log(`Delete button clicked for event: ${eventTitle}, ID: ${eventId}`);
+                if (confirm("Are you sure you want to delete this event?")) {
+                    try {
+                        await deleteDoc(doc(db, "events", eventId));
+                        alert("Event deleted successfully!");
+                        fetchEvents(); // Refresh the event list
+                    } catch (error) {
+                        console.error("Error deleting event:", error);
+                        alert("Failed to delete event. Please check your permissions or try again.");
+                    }
+                }
+            }
+        });
     }
+    
 
 // ✅ **Show "Edit Event" Form**
 function showEditEventForm(event) {
