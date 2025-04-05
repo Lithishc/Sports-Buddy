@@ -339,8 +339,10 @@ function showEditEventForm(event) {
         const description = document.getElementById("eventDescription").value.trim();
         const location = document.getElementById("eventLocationInput").value.trim();
         const sportCategory = document.getElementById("sportCategoryInput").value;
+        const area = document.getElementById("areaDropdown").value; 
+        const city = document.getElementById("cityDropdown").value;
     
-        if (!title || !dateTime || !description || !location || !sportCategory) {
+        if (!title || !dateTime || !description || !location || !sportCategory || !area || !city) {
             alert("All fields are required!");
             return;
         }
@@ -362,6 +364,8 @@ function showEditEventForm(event) {
                 date: date.split("-").reverse().join("/"),
                 time,
                 location,
+                area, 
+                city,
                 description,
                 sportCategory,
                 createdBy: user.uid,
