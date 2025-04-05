@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
             const attendButton = document.createElement("button");
             attendButton.classList.add("attend-btn");
-            attendButton.textContent = isAttending ? "Cancel Attendance" : "Attend";
+            attendButton.textContent = isAttending ? "Drop Out" : "Join Event";
     
             attendButton.addEventListener("click", () =>
                 toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
