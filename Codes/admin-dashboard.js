@@ -214,56 +214,127 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
+// ✅ **Update Event in Firestore**
+async function updateEvent(event) {
+    const title = document.getElementById("eventTitle").value.trim();
+    const dateTime = document.getElementById("eventDateTime").value;
+    const description = document.getElementById("eventDescription").value.trim();
+    const location = document.getElementById("eventLocationInput").value.trim();
+    const sportCategory = document.getElementById("sportCategoryInput").value;
+    const skillLevel = document.getElementById("skillLevelInput").value;
+    const area = document.getElementById("areaDropdown").value;
+    const city = document.getElementById("cityDropdown").value;
+
+    if (!title || !dateTime || !description || !location || !sportCategory || !skillLevel || !area || !city) {
+        alert("All fields are required!");
+        return;
+    }
+
+    try {
+        const [date, time] = dateTime.split("T");
+        await updateDoc(doc(db, "events", event.id), {
+            title,
+            date: date.split("-").reverse().join("/"),
+            time,
+            location,
+            area,
+            city,
+            description,
+            sportCategory,
+            skillLevel
+        });
+
+        alert("Event updated successfully!");
+        fetchEvents(); // Refresh the event list
+    } catch (error) {
+        console.error("Error updating event:", error);
+        alert("Failed to update event.");
+    }
+}
 
 // ✅ **Show "Edit Event" Form**
 function showEditEventForm(event) {
-    const eventCard = document.querySelector(`.event-card[data-id="${event.id}"]`);
-    if (!eventCard) return;
+    // Check if an edit form already exists to prevent duplicates
+    if (document.querySelector(".new-event")) return;
 
-    eventCard.innerHTML = `
-        <input type="text" id="editEventTitle" class="event-title-input" value="${event.title}">
-        <span class="pill">
-            <input type="datetime-local" id="editEventDateTime" class="event-date" value="${event.date}T${event.time}">
-        </span>
-        <textarea id="editEventDescription" class="event-description">${event.description}</textarea>
-        <p class="location">
-            <strong>Location:</strong> <input type="text" id="editEventLocation" class="event-location" value="${event.location}">
-        </p>
-        <button class="save-btn">Save</button>
-        <button class="cancel-btn">Cancel</button>
-    `;
+    // Fetch areas, cities, sports categories, and skill levels
+    const areas = [];
+    const cities = [];
+    const sportsCategories = [];
+    const skillLevels = ["Beginner", "Intermediate", "Advanced"]; // Static skill levels
 
-    eventCard.querySelector(".save-btn").addEventListener("click", async () => {
-        const title = document.getElementById("editEventTitle").value.trim();
-        const dateTime = document.getElementById("editEventDateTime").value;
-        const description = document.getElementById("editEventDescription").value.trim();
-        const location = document.getElementById("editEventLocation").value.trim();
+    // Fetch dropdown data from Firestore
+    Promise.all([
+        getDocs(collection(db, "areas")),
+        getDocs(collection(db, "cities")),
+        getDocs(collection(db, "sports_categories"))
+    ]).then(([areaSnapshot, citySnapshot, categorySnapshot]) => {
+        areaSnapshot.forEach(docSnap => areas.push(docSnap.data().name));
+        citySnapshot.forEach(docSnap => cities.push(docSnap.data().name));
+        categorySnapshot.forEach(docSnap => sportsCategories.push(docSnap.data().name));
 
-        if (!title || !dateTime || !description || !location) {
-            alert("All fields are required!");
-            return;
-        }
+        // Render the edit form
+        const formHTML = `
+            <div class="event-card new-event" style="opacity: 0; transform: scale(0.9);">
+                <input type="text" id="eventTitle" class="event-title-input" value="${event.title}" placeholder="Enter event title">
+                <span class="pill">
+                    <input type="datetime-local" id="eventDateTime" class="event-date" value="${event.date.split("/").reverse().join("-")}T${event.time}">
+                </span>
+                <p class="category">
+                    <strong>Sport Category:</strong>
+                    <select id="sportCategoryInput" class="event-category">
+                        <option value="" disabled>Select a category</option>
+                        ${sportsCategories.map(category => `<option value="${category}" ${category === event.sportCategory ? "selected" : ""}>${category}</option>`).join("")}
+                    </select>
+                    <strong>Skill Level:</strong>
+                    <select id="skillLevelInput" class="event-skill-level">
+                        <option value="" disabled>Select skill level</option>
+                        ${skillLevels.map(level => `<option value="${level}" ${level === event.skillLevel ? "selected" : ""}>${level}</option>`).join("")}
+                    </select>
+                </p>
+                <textarea id="eventDescription" class="event-description" placeholder="Enter event details...">${event.description}</textarea>
+                <p class="location">
+                    <strong>Location:</strong>
+                    <input type="text" id="eventLocationInput" class="event-location" value="${event.location}" placeholder="Enter location">
+                    <select id="areaDropdown" class="event-area">
+                        <option value="" disabled>Select Area</option>
+                        ${areas.map(area => `<option value="${area}" ${area === event.area ? "selected" : ""}>${area}</option>`).join("")}
+                    </select>
+                    <select id="cityDropdown" class="event-city">
+                        <option value="" disabled>Select City</option>
+                        ${cities.map(city => `<option value="${city}" ${city === event.city ? "selected" : ""}>${city}</option>`).join("")}
+                    </select>
+                </p>
+                <button class="publish-btn">Update</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        `;
 
-        try {
-            const [date, time] = dateTime.split("T");
-            await updateDoc(doc(db, "events", event.id), {
-                title,
-                date: date.split("-").reverse().join("/"),
-                time,
-                location,
-                description
-            });
+        document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
 
-            alert("Event updated successfully!");
-            fetchEvents();
-        } catch (error) {
-            console.error("Error updating event:", error);
-            alert("Failed to update event.");
-        }
-    });
+        // Animate form appearance
+        setTimeout(() => {
+            document.querySelector(".new-event").style.opacity = "1";
+            document.querySelector(".new-event").style.transform = "scale(1)";
+        }, 100);
 
-    eventCard.querySelector(".cancel-btn").addEventListener("click", () => {
-        fetchEvents();
+        // Add event listeners for dropdowns
+        document.getElementById("areaDropdown").addEventListener("change", () => {
+            const locationInput = document.getElementById("eventLocationInput");
+            const selectedArea = document.getElementById("areaDropdown").value;
+            locationInput.value = `${locationInput.value.split(",")[0].trim()}, ${selectedArea}`;
+        });
+
+        document.getElementById("cityDropdown").addEventListener("change", () => {
+            const locationInput = document.getElementById("eventLocationInput");
+            const selectedCity = document.getElementById("cityDropdown").value;
+            const parts = locationInput.value.split(",");
+            locationInput.value = `${parts[0].trim()}, ${parts[1]?.trim() || ""}, ${selectedCity}`.replace(/,\s*,/g, ",");
+        });
+
+        // Add event listeners for buttons
+        document.querySelector(".publish-btn").addEventListener("click", () => updateEvent(event));
+        document.querySelector(".cancel-btn").addEventListener("click", fetchEvents);
     });
 }
     
