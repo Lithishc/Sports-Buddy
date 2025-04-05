@@ -41,11 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (onlyMine) {
                 q = query(
                     collection(db, "events"),
-                    where("createdBy", "==", user.uid),  // ✅ Ensure filtering by logged-in user's UID
-                    orderBy("timestamp", "desc")
+                    where("createdBy", "==", user.uid),
+                    orderBy("date", "desc") // Default Firestore sorting
                 );
             } else {
-                q = query(collection(db, "events"), orderBy("timestamp", "desc"));
+                q = query(collection(db, "events"), orderBy("date", "desc"));
             }
     
             const querySnapshot = await getDocs(q);
@@ -54,7 +54,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 ...doc.data()
             }));
     
-            renderEvents(); // ✅ Ensure events update in UI
+            // Sort events by date and time
+            events.sort((a, b) => {
+                const dateA = new Date(a.date.split("/").reverse().join("-") + "T" + a.time);
+                const dateB = new Date(b.date.split("/").reverse().join("-") + "T" + b.time);
+                return dateA - dateB; // Ascending order
+            });
+    
+            console.log("Sorted events:", events); // Debugging step
+            renderEvents(); // Ensure events update in UI
         } catch (error) {
             console.error("Error fetching events:", error);
         }
@@ -245,7 +253,19 @@ async function updateEvent(event) {
         });
 
         alert("Event updated successfully!");
-        fetchEvents(); // Refresh the event list
+        switch (currentSection) {
+            case "events":
+                fetchEvents(); // Load all events
+                break;
+            case "my-events":
+                fetchEvents(true); // Load only the user's events
+                break;
+            case "attending":
+                renderAttendingEvents(); // Load attending events
+                break;
+            default:
+                fetchEvents(); // Default to all events
+        }
     } catch (error) {
         console.error("Error updating event:", error);
         alert("Failed to update event.");
