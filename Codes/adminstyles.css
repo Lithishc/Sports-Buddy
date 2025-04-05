@@ -297,7 +297,8 @@ body {
 .event-location,
 .event-area,
 .event-city ,
-#sportCategoryInput{
+#sportCategoryInput,
+.event-skill-level{
     flex: 1; /* Make inputs take equal space */
     min-width: 150px; /* Ensure a minimum width for smaller screens */
     padding: 5px 5px; /* Add padding inside inputs */
@@ -312,9 +313,23 @@ body {
 .event-location:focus,
 .event-area:focus,
 .event-city:focus ,
-#sportCategoryInput:focus {
+#sportCategoryInput:focus,
+.event-skill-level:focus {
     border-color: #007bff; /* Blue border on focus */
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Subtle shadow on focus */
+}
+.category-skill {
+    display: flex; /* Use flexbox for side-by-side alignment */
+    gap: 20px; /* Add spacing between category and skill level */
+    align-items: center; /* Align items vertically */
+    margin-bottom: 10px; /* Add spacing below the section */
+}
+
+.category-skill p {
+    margin: 0; /* Remove default margin */
+    font-size: 14px; /* Match font size with other text */
+    color: #333; /* Text color */
+    flex: 1; /* Ensure equal space for both elements */
 }
 
 /* Publish Button */

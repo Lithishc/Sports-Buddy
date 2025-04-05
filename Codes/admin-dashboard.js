@@ -192,10 +192,12 @@ document.addEventListener("DOMContentLoaded", () => {
             eventCard.innerHTML = `
                 <h2>${event.title}</h2>
                 <span class="pill">${event.date} @ ${event.time}</span>
-                <p class="category"><strong>Sport Category:</strong> ${event.sportCategory || "N/A"}</p>
+                <div class="category-skill">
+                    <p class="category"><strong>Sport Category:</strong> ${event.sportCategory || "N/A"}</p>
+                    <p class="skill-level"><strong>Skill Level:</strong> ${event.skillLevel || "N/A"}</p>
+                </div>
                 <p>${event.description}</p>
                 <p class="location"><strong>Location:</strong> ${event.location}</p>
-                
             `;
     
             eventCard.appendChild(actionButton);
@@ -262,10 +264,12 @@ function showEditEventForm(event) {
     async function showAddEventForm() {
         if (document.querySelector(".new-event")) return; // Prevent duplicate forms
     
-        // Fetch areas, cities, and sports categories from Firestore
+        // Fetch areas, cities, sports categories, and skill levels
         const areas = [];
         const cities = [];
         const sportsCategories = [];
+        const skillLevels = ["Beginner", "Intermediate", "Advanced"]; // Static skill levels
+    
         const areaSnapshot = await getDocs(collection(db, "areas"));
         const citySnapshot = await getDocs(collection(db, "cities"));
         const categorySnapshot = await getDocs(collection(db, "sports_categories"));
@@ -285,6 +289,11 @@ function showEditEventForm(event) {
                     <select id="sportCategoryInput" class="event-category">
                         <option value="" disabled selected>Select a category</option>
                         ${sportsCategories.map(category => `<option value="${category}">${category}</option>`).join("")}
+                    </select>
+                    <strong>Skill Level:</strong>
+                    <select id="skillLevelInput" class="event-skill-level">
+                        <option value="" disabled selected>Select skill level</option>
+                        ${skillLevels.map(level => `<option value="${level}">${level}</option>`).join("")}
                     </select>
                 </p>
                 <textarea id="eventDescription" class="event-description" placeholder="Enter event details..."></textarea>
@@ -339,10 +348,11 @@ function showEditEventForm(event) {
         const description = document.getElementById("eventDescription").value.trim();
         const location = document.getElementById("eventLocationInput").value.trim();
         const sportCategory = document.getElementById("sportCategoryInput").value;
-        const area = document.getElementById("areaDropdown").value; 
+        const skillLevel = document.getElementById("skillLevelInput").value; // Get selected skill level
+        const area = document.getElementById("areaDropdown").value;
         const city = document.getElementById("cityDropdown").value;
     
-        if (!title || !dateTime || !description || !location || !sportCategory || !area || !city) {
+        if (!title || !dateTime || !description || !location || !sportCategory || !skillLevel || !area || !city) {
             alert("All fields are required!");
             return;
         }
@@ -364,10 +374,11 @@ function showEditEventForm(event) {
                 date: date.split("-").reverse().join("/"),
                 time,
                 location,
-                area, 
+                area,
                 city,
                 description,
                 sportCategory,
+                skillLevel, // Save skill level
                 createdBy: user.uid,
                 creatorName: userName,
                 timestamp: serverTimestamp()
