@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { auth } from "./firebase-config.js";
 
 // Initialize Firestore
@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 adminNameElement.textContent = userDoc.exists() ? userDoc.data().name || "Admin" : "Admin";
+                
+                // ✅ Fetch all events after authentication
+                fetchEvents(); 
             } catch (error) {
                 console.error("Error fetching admin:", error);
                 adminNameElement.textContent = "Admin";
@@ -30,37 +33,52 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "login.html"; // Redirect if not logged in
         }
     });
-
-    // ✅ **Fetch Events from Firestore**
-    async function fetchEvents() {
+    // ✅ Fetch Events (All or Only User's)
+    async function fetchEvents(onlyMine = false) {
         try {
-            const q = query(collection(db, "events"), orderBy("timestamp", "desc"));
+            const user = auth.currentUser;
+            if (!user) return;
+    
+            let q;
+            if (onlyMine) {
+                q = query(
+                    collection(db, "events"),
+                    where("createdBy", "==", user.uid),  // ✅ Ensure filtering by logged-in user's UID
+                    orderBy("timestamp", "desc")
+                );
+            } else {
+                q = query(collection(db, "events"), orderBy("timestamp", "desc"));
+            }
+    
             const querySnapshot = await getDocs(q);
-
             events = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
-
-            renderEvents();
+    
+            renderEvents(); // ✅ Ensure events update in UI
         } catch (error) {
             console.error("Error fetching events:", error);
         }
     }
+    
+    
+
 
     // ✅ **Render Events & Add "Add Event" Button**
     function renderEvents() {
-        eventsContainer.innerHTML = `
+        middleSection.innerHTML = `
             <div class="header-container">
-                <h2>Event Details</h2>
+                <h2>Events</h2>
                 <button id="AddeventBtn">Add Event</button>
             </div>
             <div id="eventsWrapper"></div>
         `;
-
+    
         document.getElementById("AddeventBtn").addEventListener("click", showAddEventForm);
         updateEventList();
     }
+    
 
     // ✅ **Update Event List**
     function updateEventList() {
@@ -156,41 +174,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function switchSection(section) {
-        middleSection.innerHTML = ""; // clear the section
-    
         switch (section) {
             case "events":
-                renderEvents(); // already implemented
+                fetchEvents(); // Show all events
                 break;
             case "attending":
                 middleSection.innerHTML = "<h2>Attending Events</h2><p>Attending Events</p>";
                 break;
             case "my-events":
-                middleSection.innerHTML = "<h2>My Events</h2><p>My Events</p>";
+                fetchEvents(true); // Only show events created by the logged-in user
                 break;
             case "sports":
-                renderSimpleList("Sports Categories", ["Football", "Basketball", "Tennis"]);
+                renderAdminList("Sports Categories", "sports_categories");
                 break;
             case "cities":
-                renderSimpleList("Cities", ["New York", "London", "Delhi"]);
+                renderAdminList("Cities", "cities");
                 break;
             case "areas":
-                renderSimpleList("Areas", ["Downtown", "Uptown", "Midtown"]);
+                renderAdminList("Areas", "areas");
                 break;
+            default:
+                document.getElementById("eventsWrapper").innerHTML = `<h2>Coming Soon</h2>`;
         }
     }
+    
+    
+    
 
-    function renderSimpleList(title, items) {
-        middleSection.innerHTML = `<h2>${title}</h2>`;
-        const ul = document.createElement("ul");
-        ul.className = "simple-list";
-        items.forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = item;
-            ul.appendChild(li);
-        });
-        middleSection.appendChild(ul);
-    }
 
     // Handle sidebar navigation clicks
 document.querySelectorAll(".sidebar-item").forEach(item => {
@@ -203,109 +213,94 @@ document.querySelectorAll(".sidebar-item").forEach(item => {
     });
 });
 
-sidebarItems.forEach(item => {
-    item.addEventListener("click", () => {
-        const section = item.getAttribute("data-section");
-
-        switch (section) {
-            case "events":
-                fetchEvents();
-                break;
-            case "sports":
-                renderAdminList("Sports Categories", "sports_categories");
-                break;
-            case "cities":
-                renderAdminList("Cities", "cities");
-                break;
-            case "areas":
-                renderAdminList("Areas", "areas");
-                break;
-            default:
-                eventsContainer.innerHTML = `<h2>Coming Soon</h2>`;
-        }
-    });
-});
 
 async function renderAdminList(title, collectionName) {
     eventsContainer.innerHTML = `
         <div class="header-container">
             <h2>${title}</h2>
-            <button id="addBtn">Add ${title.slice(0, -1)}</button>
+            <button id="addBtn">Add ${formatSingular(collectionName)}</button>
         </div>
         <ul id="adminList" class="admin-list"></ul>
     `;
 
-    document.getElementById("addBtn").addEventListener("click", () => showAddItemForm(collectionName));
+    document.getElementById("addBtn").addEventListener("click", () => showInputField(collectionName));
 
     const querySnapshot = await getDocs(collection(db, collectionName));
     let items = [];
 
-    // Fetch and store items
     querySnapshot.forEach(docSnap => {
         items.push({ id: docSnap.id, name: docSnap.data().name });
     });
 
-    // Sort items alphabetically
+    // ✅ Restore alphabetical sorting
     items.sort((a, b) => a.name.localeCompare(b.name));
 
-    // Group by first letter
-    let groupedItems = {};
-    items.forEach(item => {
-        let firstLetter = item.name.charAt(0).toUpperCase();
-        if (!groupedItems[firstLetter]) {
-            groupedItems[firstLetter] = [];
-        }
-        groupedItems[firstLetter].push(item);
-    });
-
-    // Render list
     const listContainer = document.getElementById("adminList");
     listContainer.innerHTML = "";
 
-    Object.keys(groupedItems).sort().forEach(letter => {
-        // Add letter heading
-        const letterHeading = document.createElement("li");
-        letterHeading.classList.add("letter-heading");
-        letterHeading.textContent = letter;
-        listContainer.appendChild(letterHeading);
-
-        // Add items under the letter
-        groupedItems[letter].forEach(item => {
-            const li = document.createElement("li");
-            li.classList.add("admin-item");
-            li.innerHTML = `
-                <span>${item.name}</span>
-                <button class="delete-btn" data-id="${item.id}" data-collection="${collectionName}">Delete</button>
-            `;
-            listContainer.appendChild(li);
-        });
+    items.forEach(item => {
+        const li = document.createElement("li");
+        li.classList.add("admin-item");
+        li.innerHTML = `
+            <span>${item.name}</span>
+            <button class="delete-btn" data-id="${item.id}" data-collection="${collectionName}">Delete</button>
+        `;
+        listContainer.appendChild(li);
     });
 
-    // Handle delete button clicks
+    // ✅ Handle delete functionality
     listContainer.addEventListener("click", async (e) => {
         if (e.target.classList.contains("delete-btn")) {
             const id = e.target.getAttribute("data-id");
             const collection = e.target.getAttribute("data-collection");
             if (confirm("Delete this item?")) {
                 await deleteDoc(doc(db, collection, id));
-                renderAdminList(title, collection); // Refresh after delete
+                renderAdminList(title, collection);
             }
         }
     });
 }
 
+// ✅ Keep the existing input UI unchanged
+function showInputField(collectionName) {
+    if (document.querySelector(".new-item-input")) return; // Prevent duplicate input fields
 
-function showAddItemForm(collectionName) {
-    const inputName = prompt(`Enter new ${collectionName.slice(0, -1)} name:`);
+    const listContainer = document.getElementById("adminList");
+
+    const inputItem = document.createElement("li");
+    inputItem.classList.add("admin-item", "new-item-input");
+    inputItem.innerHTML = `
+        <input type="text" id="newItemInput" placeholder="Enter ${formatSingular(collectionName)} name">
+        <button id="confirmAddBtn">Add</button>
+        <button id="cancelAddBtn">Cancel</button>
+    `;
+
+    listContainer.insertAdjacentElement("afterbegin", inputItem);
+
+    document.getElementById("confirmAddBtn").addEventListener("click", () => addItem(collectionName));
+    document.getElementById("cancelAddBtn").addEventListener("click", () => inputItem.remove());
+}
+
+// ✅ Fix singularization
+function formatSingular(collectionName) {
+    if (collectionName === "sports_categories") return "Category";
+    if (collectionName === "cities") return "City";
+    if (collectionName === "areas") return "Area";
+    return collectionName.slice(0, -1);
+}
+
+// ✅ Add new item while keeping sorting intact
+function addItem(collectionName) {
+    const inputField = document.getElementById("newItemInput");
+    const inputName = inputField.value.trim();
 
     if (inputName) {
         addDoc(collection(db, collectionName), {
-            name: inputName.trim(),
+            name: inputName,
             timestamp: serverTimestamp()
         }).then(() => {
             renderAdminList(
-                collectionName === "sports_categories" ? "Sports Categories"
-                : collectionName.charAt(0).toUpperCase() + collectionName.slice(1),
+                collectionName === "sports_categories" ? "Sports Categories" : collectionName.charAt(0).toUpperCase() + collectionName.slice(1),
                 collectionName
             );
         }).catch(err => {
@@ -313,6 +308,7 @@ function showAddItemForm(collectionName) {
         });
     }
 }
+
 
 
     // ✅ **Logout Function**
