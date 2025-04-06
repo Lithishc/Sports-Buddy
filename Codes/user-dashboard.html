@@ -4,43 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard | Sports Buddy</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="userstyles.css">
 </head>
 <body>
-    <h1>Welcome to Sports Buddy</h1>
-    
-    <button id="logoutBtn">Logout</button>
+    <div class="dashboard-container">
+        
+        <!-- Left Section -->
+        <div class="left-section">
+            <h1>Sports Buddy</h1>
+            <div class="user-container">
+                <p id="userName">User Name</p>
+                <div class="user-pill">Buddy</div>
+            </div>
+            <div class="list-section">
+                <ul class="sidebar-list">
+                    <li class="sidebar-item" data-section="events">Events</li>
+                    <li class="sidebar-item" data-section="attending">Attending</li>
+                    <li class="sidebar-item" data-section="my-events">My Events</li>
+                </ul>
+            </div>
+        </div>
 
-    <!-- Search & Filter -->
-    <h2>Find an Event</h2>
-    <input type="text" id="searchInput" placeholder="Search by name">
-    <select id="sportFilter">
-        <option value="">All Sports</option>
-        <option value="Football">Football</option>
-        <option value="Basketball">Basketball</option>
-        <option value="Tennis">Tennis</option>
-    </select>
-    <input type="date" id="dateFilter">
-    <button id="filterBtn">Filter</button>
+       <!-- Middle Section -->
+<div class="middle-section">
+    <div class="header-container">
+        <h2>Events</h2>
+        <button id="AddeventBtn">Add Event</button>
+    </div>
 
-    <!-- Create an Event -->
-    <h2>Create an Event</h2>
-    <form id="eventForm">
-        <input type="text" id="eventName" placeholder="Event Name" required>
-        <input type="text" id="sportType" placeholder="Sport Type" required>
-        <input type="text" id="location" placeholder="Location" required>
-        <input type="date" id="date" required>
-        <input type="time" id="time" required>
-        <button type="submit">Create Event</button>
-    </form>
+    <!-- Existing Event Card -->
+    <div class="event-card">
+        <h2>Event Title</h2>
+        <div class="pill datetime-picker" id="datetimePicker">
+            <input type="text" id="eventDateTimeDisplay" placeholder="DD/MM/YYYY & HH.MM AM/PM" readonly>
+        </div>
+        <p>Information about the event.</p>
+        <p class="location">
+            <strong>Location:</strong> <span id="eventLocation">New York</span>
+        </p>
+        <div class="category-skill">
+            <p class="category"><strong>Sport Category:</strong> N/A</p>
+            <p class="skill-level"><strong>Skill Level:</strong>N/A</p>
+        </div>
+        <button class="attend-btn">Attend</button>
+    </div>
 
-    <!-- My Events Section -->
-    <h2>My Events</h2>
-    <ul id="myEventsList"></ul>
+    <!-- New Event Form -->
+    <div class="event-card new-event-form">
+        <input type="text" id="eventTitle" placeholder="Enter Event Title" class="event-title-input title-style">
 
-    <!-- Available Events -->
-    <h2>All Events</h2>
-    <ul id="eventList"></ul>
+        <!-- Date & Time Input -->
+        <div class="pill datetime-picker" id="datetimePicker">
+            <input type="text" id="eventDateTimeDisplay" placeholder="DD/MM/YYYY & HH.MM AM/PM" readonly>
+        </div>
+
+        <!-- Hidden Input for Actual Date Selection -->
+        <input type="datetime-local" id="eventDateTime" class="event-date-input" style="display: none;">
+
+        <textarea id="eventDescription" placeholder="Enter Information............" class="event-description"></textarea>
+
+        <!-- Styled Location Input -->
+        <p class="location">
+            <strong>Location:</strong>
+            <input type="text" id="eventLocationInput" placeholder="Enter Location" class="event-location-input location-style">
+        </p>
+
+        <button id="publishEvent" class="publish-btn">Publish</button>
+    </div>
+    <div id="eventsWrapper"></div>
+</div> 
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <button id="logoutBtn">Logout</button>
+            <h2>Search</h2>
+            <input type="text" id="filterInput" placeholder="Search events...">
+            <h2>Filters</h2>
+            <div id="filtersContainer">
+                <select id="skillFilter" class="filter-dropdown">
+                    <option value="">Select Skill Level</option>
+                </select>
+                <select id="sportsCategoryFilter" class="filter-dropdown">
+                    <option value="">Select Sports Category</option>
+                </select>
+                <select id="cityFilter" class="filter-dropdown">
+                    <option value="">Select City</option>
+                </select>
+                <select id="areaFilter" class="filter-dropdown">
+                    <option value="">Select Area</option>
+                </select>
+                <div id="activeFilters" class="active-filters"></div>
+                <div class="filter-buttons">
+                    <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
+                    <button id="resetFiltersBtn" class="reset-filters-btn">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Closes dashboard-container properly -->
 
     <script defer type="module" src="user-dashboard.js"></script>
 </body>

@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ **Render Events & Add "Add Event" Button**
     function renderEvents() {
-        if (currentSection !== "events") return; // Ensure this function only runs for the "events" section
+        if (currentSection !== "events" && currentSection !== "my-events") return; // Ensure this function only runs for the "events" section
     
         middleSection.innerHTML = `
             <div class="header-container">
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-// ✅ **Update Event in Firestore**
+// **Update Event in Firestore**
 async function updateEvent(event) {
     const title = document.getElementById("eventTitle").value.trim();
     const dateTime = document.getElementById("eventDateTime").value;
@@ -722,6 +722,7 @@ async function toggleAttendance(eventId, isAttending, docId) {
 
    
 
+//Right Section
 
 //right section search and filter code
 document.getElementById("filterInput").addEventListener("input", (e) => {
@@ -910,6 +911,6 @@ document.getElementById("resetFiltersBtn").addEventListener("click", () => {
 
 
 
-    // ✅ **Fetch Events on Load**
+    // **Fetch Events on Load**//
     fetchEvents();
 });
