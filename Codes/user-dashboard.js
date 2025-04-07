@@ -215,12 +215,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     wrapper.addEventListener("click", async (e) => {
                         if (e.target.classList.contains("event-delete-btn")) {
                             const eventId = e.target.getAttribute("data-id");
-                            const eventTitle = e.target.getAttribute("data-title");
-                            if (confirm("Are you sure you want to delete this event?")) {
+                            const eventTitle = e.target.getAttribute("eventtitle");
+                            if (confirm("Are you sure you want to delete this event: ?")) {
                                 try {
                                     await deleteDoc(doc(db, "events", eventId));
                                     alert("Event deleted successfully!");
-                                    fetchEvents(); // Refresh the list
+                                    if (currentSection === "my-events") {
+                                        fetchEvents(true);
+                                    } else {
+                                        fetchEvents();
+                                    } // Refresh the list
                                 } catch (error) {
                                     console.error("Error deleting event:", error);
                                     alert("Failed to delete event.");
@@ -360,8 +364,22 @@ document.addEventListener("DOMContentLoaded", () => {
                });
        
                // Add event listeners for buttons
-               document.querySelector(".publish-btn").addEventListener("click", () => updateEvent(event));
-               document.querySelector(".cancel-btn").addEventListener("click", fetchEvents);
+               document.querySelector(".publish-btn").addEventListener("click", () => {
+                if (currentSection === "my-events") {
+                    updateEvent(event);
+                    fetchEvents(true);
+                } else {
+                    updateEvent(event);
+                    fetchEvents();
+                }
+            });
+               document.querySelector(".cancel-btn").addEventListener("click", () => {
+                if (currentSection === "my-events") {
+                    fetchEvents(true);
+                } else {
+                    fetchEvents();
+                }
+            });
            });
        }
            
@@ -445,7 +463,15 @@ document.addEventListener("DOMContentLoaded", () => {
                });
            
                // Add event listeners for buttons
-               document.querySelector(".publish-btn").addEventListener("click", publishEvent);
+               document.querySelector(".publish-btn").addEventListener("click", () => {
+                if (currentSection === "my-events") {
+                    publishEvent();
+                    fetchEvents(true);
+                } else {
+                    publishEvent();
+                    fetchEvents();
+                }
+            });
                document.querySelector(".cancel-btn").addEventListener("click", () => {
                 if (currentSection === "my-events") {
                     fetchEvents(true);
@@ -500,7 +526,11 @@ document.addEventListener("DOMContentLoaded", () => {
                    });
            
                    alert("Event added successfully!");
-                   fetchEvents();
+                   if (currentSection === "my-events") {
+                    fetchEvents(true);
+                } else {
+                    fetchEvents();
+                }
                } catch (error) {
                    console.error("Error adding event:", error);
                    alert("Failed to add event.");

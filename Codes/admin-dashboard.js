@@ -220,7 +220,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         try {
                             await deleteDoc(doc(db, "events", eventId));
                             alert("Event deleted successfully!");
-                            fetchEvents(); // Refresh the list
+                            if (currentSection === "my-events") {
+                                fetchEvents(true);
+                            } else {
+                                fetchEvents();
+                            } // Refresh the list
                         } catch (error) {
                             console.error("Error deleting event:", error);
                             alert("Failed to delete event.");
@@ -361,8 +365,22 @@ function showEditEventForm(event) {
         });
 
         // Add event listeners for buttons
-        document.querySelector(".publish-btn").addEventListener("click", () => updateEvent(event));
-        document.querySelector(".cancel-btn").addEventListener("click", fetchEvents);
+        document.querySelector(".publish-btn").addEventListener("click", () => {
+            if (currentSection === "my-events") {
+                updateEvent(event);
+                fetchEvents(true);
+            } else {
+                updateEvent(event);
+                fetchEvents();
+            }
+        });
+           document.querySelector(".cancel-btn").addEventListener("click", () => {
+            if (currentSection === "my-events") {
+                fetchEvents(true);
+            } else {
+                fetchEvents();
+            }
+        });
     });
 }
     
@@ -446,7 +464,15 @@ function showEditEventForm(event) {
         });
     
         // Add event listeners for buttons
-        document.querySelector(".publish-btn").addEventListener("click", publishEvent);
+        document.querySelector(".publish-btn").addEventListener("click", () => {
+            if (currentSection === "my-events") {
+                publishEvent();
+                fetchEvents(true);
+            } else {
+                publishEvent();
+                fetchEvents();
+            }
+        });
         document.querySelector(".cancel-btn").addEventListener("click", () => {
             if (currentSection === "my-events") {
                 fetchEvents(true);
@@ -500,7 +526,13 @@ function showEditEventForm(event) {
             });
     
             alert("Event added successfully!");
-            fetchEvents();
+            if (currentSection === "my-events") {
+                updateEvent(event);
+                fetchEvents(true);
+            } else {
+                updateEvent(event);
+                fetchEvents();
+            }
         } catch (error) {
             console.error("Error adding event:", error);
             alert("Failed to add event.");
