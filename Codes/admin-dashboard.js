@@ -143,86 +143,92 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("AddeventBtn").addEventListener("click", showAddEventForm);
         updateEventList(events, "eventsWrapper"); // Update the event list for the "events" section
     }
+    function renderMyEvents() {
+        middleSection.innerHTML = `
+            <div class="header-container">
+                <h2>My Events</h2>
+            </div>
+            <div id="myEventsWrapper"></div>
+        `;
     
+        updateEventList(events, "myEventsWrapper"); // Update the event list with only the user's events
+    }
 
     // ✅ **Update Event List**
     async function updateEventList(eventList = events, containerId = "eventsWrapper") {
-        const wrapper = document.getElementById(containerId);
-        wrapper.innerHTML = "";
-    
-        const user = auth.currentUser;
-        const attendanceMap = user ? await getUserAttendanceMap(user.uid) : {};
-    
-        eventList.forEach(event => {
-            const eventCard = document.createElement("div");
-            eventCard.classList.add("event-card");
-            eventCard.style.position = "relative"; // Needed for absolute positioning
-    
-            const isCreator = user && event.createdBy === user.uid;
-            const status = attendanceMap[event.id]?.status;
-            const isAttending = status === "attending";
-    
-            // Add Delete Button for Event Creator
-            if (isCreator) {
-                console.log(`Adding delete button for event: ${event.title}`);
-                const deleteButton = document.createElement("button");
-                deleteButton.classList.add("event-delete-btn");
-                deleteButton.textContent = "Delete";
-    
-                deleteButton.setAttribute("data-id", event.id);
-                deleteButton.setAttribute("data-title", event.title);
-    
-                eventCard.appendChild(deleteButton);
-                console.log(`Delete button added for event: ${event.title}`);
-            }
-    
-            const actionButton = document.createElement("button");
-            actionButton.classList.add("attend-btn");
-    
-            if (isCreator) {
-                actionButton.textContent = "Edit";
-                actionButton.addEventListener("click", () => showEditEventForm(event));
-            } else {
-                actionButton.textContent = isAttending ? "Drop Out" : "Join Event";
-                actionButton.addEventListener("click", () =>
-                    toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
-                );
-            }
-    
-            eventCard.innerHTML += `
-                <h2>${event.title}</h2>
-                <span class="pill">${event.date} @ ${event.time}</span>
-                <div class="category-skill">
-                    <p class="category"><strong>Sport Category:</strong> ${event.sportCategory || "N/A"}</p>
-                    <p class="skill-level"><strong>Skill Level:</strong> ${event.skillLevel || "N/A"}</p>
-                </div>
-                <p>${event.description}</p>
-                <p class="location"><strong>Location:</strong> ${event.location}</p>
-            `;
-    
-            eventCard.appendChild(actionButton);
-            wrapper.appendChild(eventCard);
-        });
-    
-        // Attach event listener to the wrapper for delete functionality
-        wrapper.addEventListener("click", async (e) => {
-            if (e.target.classList.contains("event-delete-btn")) {
-                const eventId = e.target.getAttribute("data-id");
-                const eventTitle = e.target.getAttribute("data-title");
-                console.log(`Delete button clicked for event: ${eventTitle}, ID: ${eventId}`);
-                if (confirm("Are you sure you want to delete this event?")) {
-                    try {
-                        await deleteDoc(doc(db, "events", eventId));
-                        alert("Event deleted successfully!");
-                        fetchEvents(); // Refresh the event list
-                    } catch (error) {
-                        console.error("Error deleting event:", error);
-                        alert("Failed to delete event. Please check your permissions or try again.");
+            const wrapper = document.getElementById(containerId);
+            wrapper.innerHTML = "";
+        
+            const user = auth.currentUser;
+            const attendanceMap = user ? await getUserAttendanceMap(user.uid) : {};
+        
+            eventList.forEach(event => {
+                const eventCard = document.createElement("div");
+                eventCard.classList.add("event-card");
+                eventCard.style.position = "relative";
+        
+                const isCreator = user && event.createdBy === user.uid;
+                const status = attendanceMap[event.id]?.status;
+                const isAttending = status === "attending";
+        
+                // Create action button
+                const actionButton = document.createElement("button");
+                actionButton.classList.add("attend-btn");
+        
+                // ✅ Only show Edit/Delete if in "my-events" section and user is the creator
+                if (currentSection === "my-events" && isCreator) {
+                    const deleteButton = document.createElement("button");
+                    deleteButton.classList.add("event-delete-btn");
+                    deleteButton.textContent = "Delete";
+                    deleteButton.setAttribute("data-id", event.id);
+                    deleteButton.setAttribute("data-title", event.title);
+                    eventCard.appendChild(deleteButton);
+        
+                    actionButton.textContent = "Edit";
+                    actionButton.addEventListener("click", () => showEditEventForm(event));
+                } else {
+                    actionButton.textContent = isAttending ? "Drop Out" : "Join Event";
+                    actionButton.addEventListener("click", () =>
+                        toggleAttendance(event.id, isAttending, attendanceMap[event.id]?.docId)
+                    );
+                }
+        
+                eventCard.innerHTML += `
+                 <h2>
+                     ${event.title}
+                        ${isCreator ? `<span class="event-badge">My Event</span>` : ""}
+                </h2>
+                    <span class="pill">${event.date} @ ${event.time}</span>
+                    <div class="category-skill">
+                        <p class="category"><strong>Sport Category:</strong> ${event.sportCategory || "N/A"}</p>
+                        <p class="skill-level"><strong>Skill Level:</strong> ${event.skillLevel || "N/A"}</p>
+                    </div>
+                    <p>${event.description}</p>
+                    <p class="location"><strong>Location:</strong> ${event.location}</p>
+                `;
+        
+                eventCard.appendChild(actionButton);
+                wrapper.appendChild(eventCard);
+            });
+        
+            // Delete button handler
+            wrapper.addEventListener("click", async (e) => {
+                if (e.target.classList.contains("event-delete-btn")) {
+                    const eventId = e.target.getAttribute("data-id");
+                    const eventTitle = e.target.getAttribute("data-title");
+                    if (confirm("Are you sure you want to delete this event?")) {
+                        try {
+                            await deleteDoc(doc(db, "events", eventId));
+                            alert("Event deleted successfully!");
+                            fetchEvents(); // Refresh the list
+                        } catch (error) {
+                            console.error("Error deleting event:", error);
+                            alert("Failed to delete event.");
+                        }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
     
 // **Update Event in Firestore**
 async function updateEvent(event) {
@@ -441,7 +447,13 @@ function showEditEventForm(event) {
     
         // Add event listeners for buttons
         document.querySelector(".publish-btn").addEventListener("click", publishEvent);
-        document.querySelector(".cancel-btn").addEventListener("click", fetchEvents);
+        document.querySelector(".cancel-btn").addEventListener("click", () => {
+            if (currentSection === "my-events") {
+                fetchEvents(true);
+            } else {
+                fetchEvents();
+            }
+        });
     }
 
     // ✅ **Publish Event to Firestore**
@@ -524,16 +536,7 @@ function showEditEventForm(event) {
     }
     
     
-    function renderMyEvents() {
-        middleSection.innerHTML = `
-            <div class="header-container">
-                <h2>My Events</h2>
-            </div>
-            <div id="myEventsWrapper"></div>
-        `;
     
-        updateEventList(events, "myEventsWrapper"); // Update the event list with only the user's events
-    }
 
 
     // Handle sidebar navigation clicks
