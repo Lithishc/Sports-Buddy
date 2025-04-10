@@ -107,7 +107,7 @@ forgotPasswordLink.addEventListener("click", async (e) => {
 // Redirect to Register Page
 createAccountLink.addEventListener("click", (e) => {
     e.preventDefault();
-    window.location.href = "register.html";
+    window.location.href = "registry.html";
 });
 
 // Ensure the correct toggle button is highlighted on page load
