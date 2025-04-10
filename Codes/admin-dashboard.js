@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentSection = "events"; // default section
 
 
-    // ✅ **Fetch Admin Name**
+    // **Fetch Admin Name**
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 adminNameElement.textContent = userDoc.exists() ? userDoc.data().name || "Admin" : "Admin";
                 
-                // ✅ Fetch all events after authentication
+                // Fetch all events after authentication
                 fetchEvents(); 
             } catch (error) {
                 console.error("Error fetching admin:", error);
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "login.html"; // Redirect if not logged in
         }
     });
-    // ✅ Fetch Events (All or Only User's)
+    // Fetch Events (All or Only User's)
     async function fetchEvents(onlyMine = false) {
         try {
             const user = auth.currentUser;
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
 
 
-    // ✅ **Render Events & Add "Add Event" Button**
+    //**Render Events & Add "Add Event" Button**
     function renderEvents() {
         if (currentSection == "events" ){// Ensure this function only runs for the "events" section
     
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
  
-    // ✅ **Update Event List**
+    // **Update Event List**
     async function updateEventList(eventList = events, containerId = "eventsWrapper") {
             const wrapper = document.getElementById(containerId);
             wrapper.innerHTML = "";
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const actionButton = document.createElement("button");
                 actionButton.classList.add("attend-btn");
         
-                // ✅ Only show Edit/Delete if in "my-events" section and user is the creator
+                // Only show Edit/Delete if in "my-events" section and user is the creator
                 if (currentSection === "my-events" && isCreator) {
                     const deleteButton = document.createElement("button");
                     deleteButton.classList.add("event-delete-btn");
@@ -294,7 +294,7 @@ async function updateEvent(event) {
     }
 }
 
-// ✅ **Show "Edit Event" Form**
+// **Show "Edit Event" Form**
 function showEditEventForm(event) {
     // Check if an edit form already exists to prevent duplicates
     if (document.querySelector(".new-event")) return;
@@ -397,7 +397,7 @@ function showEditEventForm(event) {
     
     
 
-    // ✅ **Show "Add Event" Form**
+    // **Show "Add Event" Form**
     async function showAddEventForm() {
         if (document.querySelector(".new-event")) return; // Prevent duplicate forms
     
@@ -492,14 +492,14 @@ function showEditEventForm(event) {
         });
     }
 
-    // ✅ **Publish Event to Firestore**
+    //**Publish Event to Firestore**
     async function publishEvent() {
         const title = document.getElementById("eventTitle").value.trim();
         const dateTime = document.getElementById("eventDateTime").value;
         const description = document.getElementById("eventDescription").value.trim();
         const location = document.getElementById("eventLocationInput").value.trim();
         const sportCategory = document.getElementById("sportCategoryInput").value;
-        const skillLevel = document.getElementById("skillLevelInput").value; // Get selected skill level
+        const skillLevel = document.getElementById("skillLevelInput").value; 
         const area = document.getElementById("areaDropdown").value;
         const city = document.getElementById("cityDropdown").value;
     
@@ -550,7 +550,7 @@ function showEditEventForm(event) {
     }
 
     function switchSection(section) {
-        currentSection = section; // ✅ Track current section
+        currentSection = section; // Track current section
     
         switch (section) {
             case "events":
@@ -562,6 +562,9 @@ function showEditEventForm(event) {
             case "my-events":
                 fetchEvents(true); // Fetch only the user's events
                 renderEvents(); // Render the My Events section
+                break;
+            case "participants":
+                loadparticipants(); // Fetch attending and not attending events
                 break;
             case "sports":
                 renderAdminList("Sports Categories", "sports_categories");
@@ -577,10 +580,6 @@ function showEditEventForm(event) {
         }
     }
     
-    
-    
-
-
     // Handle sidebar navigation clicks
 document.querySelectorAll(".sidebar-item").forEach(item => {
     item.addEventListener("click", () => {
@@ -751,6 +750,94 @@ async function toggleAttendance(eventId, isAttending, docId) {
         console.error("Error updating attendance:", error);
     }
 }
+
+
+async function loadparticipants() {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const q = query(collection(db, "events"), where("createdBy", "==", user.uid));
+    const eventsSnapshot = await getDocs(q);
+  
+    const middleSection = document.querySelector(".middle-section");
+    middleSection.innerHTML = `
+      <div class="header-container">
+        <h2>Participants for My Created Events</h2>
+      </div>
+    `;
+  
+    for (const eventDoc of eventsSnapshot.docs) {
+      const eventData = eventDoc.data();
+      const eventId = eventDoc.id;
+  
+      // Event card container
+      const eventCard = document.createElement("div");
+      eventCard.className = "event-participant";
+  
+      const title = document.createElement("h2");
+      title.textContent = `Event: ${eventData.title}`;
+  
+      const toggleButton = document.createElement("button");
+      toggleButton.className = "toggle-button";
+      toggleButton.textContent = "Show Participants";
+  
+      const participantListContainer = document.createElement("div");
+      participantListContainer.style.display = "none";
+  
+      toggleButton.addEventListener("click", async () => {
+        if (participantListContainer.style.display === "none") {
+          participantListContainer.innerHTML = "Loading participants...";
+  
+          const attendeesQuery = query(
+            collection(db, "attendees"),
+            where("eventId", "==", eventId),
+            where("status", "==", "attending")
+          );
+          const attendeesSnapshot = await getDocs(attendeesQuery);
+  
+          participantListContainer.innerHTML = "";
+  
+          if (attendeesSnapshot.empty) {
+            participantListContainer.innerHTML = "<p>No participants found.</p>";
+          } else {
+            for (const attendeeDoc of attendeesSnapshot.docs) {
+              const attendee = attendeeDoc.data();
+              const userSnap = await getDoc(doc(db, "users", attendee.userId));
+  
+              if (userSnap.exists()) {
+                const userData = userSnap.data();
+                const participantCard = document.createElement("div");
+                participantCard.className = "participant-card";
+  
+                participantCard.innerHTML = `
+                  <strong>Name:</strong> ${userData.name || "N/A"}<br>
+                  <strong>Skill:</strong> ${userData.skill || "N/A"}<br>
+                  <strong>Age:</strong> ${userData.age || "N/A"}<br>
+                  <strong>Gender:</strong> ${userData.gender || "N/A"}<br>
+                  <strong>Email:</strong> ${userData.email || "N/A"}
+                `;
+  
+                participantListContainer.appendChild(participantCard);
+              }
+            }
+          }
+  
+          participantListContainer.style.display = "block";
+          toggleButton.textContent = "Hide Participants";
+        } else {
+          participantListContainer.style.display = "none";
+          toggleButton.textContent = "Show Participants";
+        }
+      });
+  
+      eventCard.appendChild(title);
+      eventCard.appendChild(toggleButton);
+      eventCard.appendChild(participantListContainer);
+      middleSection.appendChild(eventCard);
+    }
+  }
+  
+  
 
 
 

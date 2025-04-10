@@ -213,6 +213,50 @@ body {
     font-size: 14px; /* Slightly smaller font size */
     color: #333; /* Text color */
 }
+.event-participant {
+    background-color: #ffffff; /* Solid white background */
+    padding: 10px 20px; /* Padding inside the card */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin: 10px; /* Center the card horizontally */
+    font-family: 'Arial', sans-serif; /* Consistent font */
+    color: #333; /* Text color */
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Consistent spacing between elements */
+    position: relative; 
+}
+
+.toggle-button {
+  background-color: #b3e5fc;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  align-self: flex-start;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-button:hover {
+  background-color: #73b6d5ae;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+
+.participant-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 12px;
+    margin: 6px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    font-size: 14px;
+}
+
 
 .attend-btn {
     position: absolute; /* Position the button */

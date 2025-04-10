@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 userNameElement.textContent = userDoc.exists() ? userDoc.data().name || "User" : "User";
                 
-                // ✅ Fetch all events after authentication
+                //  Fetch all events after authentication
                 fetchEvents(); 
             } catch (error) {
                 console.error("Error fetching user:", error);
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ✅ Fetch Events (All or Only User's)
+    //Fetch Events (All or Only User's)
         async function fetchEvents(onlyMine = false) {
             try {
                 const user = auth.currentUser;
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         
-            // 👉 Inject "status" property for filtering later
+            // Inject "status" property for filtering later
             const attendingEvents = attendingIds.map(id => ({ ...idToEvent[id], status: "attending" })).filter(Boolean);
             const canceledEvents = canceledIds.map(id => ({ ...idToEvent[id], status: "not attending" })).filter(Boolean);
         
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
     
     
-        // ✅ **Render Events & Add "Add Event" Button**
+        // **Render Events & Add "Add Event" Button**
         function renderEvents() {
             if (currentSection == "events" ){// Ensure this function only runs for the "events" section
         
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
         }
     
-        // ✅ **Update Event List**
+        //**Update Event List**
         async function updateEventList(eventList = events, containerId = "eventsWrapper") {
                     const wrapper = document.getElementById(containerId);
                     wrapper.innerHTML = "";
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Failed to update event.");
         }
     }
-       // ✅ **Show "Edit Event" Form**
+       //**Show "Edit Event" Form**
        function showEditEventForm(event) {
            // Check if an edit form already exists to prevent duplicates
            if (document.querySelector(".new-event")) return;
@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
    
            
        
-           // ✅ **Show "Add Event" Form**
+           //**Show "Add Event" Form**
            async function showAddEventForm() {
                if (document.querySelector(".new-event")) return; // Prevent duplicate forms
            
@@ -548,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
            }
        
            function switchSection(section) {
-               currentSection = section; // ✅ Track current section
+               currentSection = section; //  Track current section
            
                switch (section) {
                    case "events":
@@ -561,6 +561,9 @@ document.addEventListener("DOMContentLoaded", () => {
                        renderEvents(); // Render the My Events section
                        fetchEvents(true); // Fetch only the user's events
                        break;
+                    case "my-events":
+                        loadparticipants(); // Load participants for the user's created events
+                        break;
                    default:
                        middleSection.innerHTML = `<h2>Coming Soon</h2>`;
                }
@@ -628,7 +631,92 @@ async function toggleAttendance(eventId, isAttending, docId) {
     }
 }
 
-// ✅ **Logout Function**
+async function loadparticipants() {
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    const q = query(collection(db, "events"), where("createdBy", "==", user.uid));
+    const eventsSnapshot = await getDocs(q);
+  
+    const middleSection = document.querySelector(".middle-section");
+    middleSection.innerHTML = `
+      <div class="header-container">
+        <h2>Participants for My Created Events</h2>
+      </div>
+    `;
+  
+    for (const eventDoc of eventsSnapshot.docs) {
+      const eventData = eventDoc.data();
+      const eventId = eventDoc.id;
+  
+      // Event card container
+      const eventCard = document.createElement("div");
+      eventCard.className = "event-participant";
+  
+      const title = document.createElement("h2");
+      title.textContent = `Event: ${eventData.title}`;
+  
+      const toggleButton = document.createElement("button");
+      toggleButton.className = "toggle-button";
+      toggleButton.textContent = "Show Participants";
+  
+      const participantListContainer = document.createElement("div");
+      participantListContainer.style.display = "none";
+  
+      toggleButton.addEventListener("click", async () => {
+        if (participantListContainer.style.display === "none") {
+          participantListContainer.innerHTML = "Loading participants...";
+  
+          const attendeesQuery = query(
+            collection(db, "attendees"),
+            where("eventId", "==", eventId),
+            where("status", "==", "attending")
+          );
+          const attendeesSnapshot = await getDocs(attendeesQuery);
+  
+          participantListContainer.innerHTML = "";
+  
+          if (attendeesSnapshot.empty) {
+            participantListContainer.innerHTML = "<p>No participants found.</p>";
+          } else {
+            for (const attendeeDoc of attendeesSnapshot.docs) {
+              const attendee = attendeeDoc.data();
+              const userSnap = await getDoc(doc(db, "users", attendee.userId));
+  
+              if (userSnap.exists()) {
+                const userData = userSnap.data();
+                const participantCard = document.createElement("div");
+                participantCard.className = "participant-card";
+  
+                participantCard.innerHTML = `
+                  <strong>Name:</strong> ${userData.name || "N/A"}<br>
+                  <strong>Skill:</strong> ${userData.skill || "N/A"}<br>
+                  <strong>Age:</strong> ${userData.age || "N/A"}<br>
+                  <strong>Gender:</strong> ${userData.gender || "N/A"}<br>
+                  <strong>Email:</strong> ${userData.email || "N/A"}
+                `;
+  
+                participantListContainer.appendChild(participantCard);
+              }
+            }
+          }
+  
+          participantListContainer.style.display = "block";
+          toggleButton.textContent = "Hide Participants";
+        } else {
+          participantListContainer.style.display = "none";
+          toggleButton.textContent = "Show Participants";
+        }
+      });
+  
+      eventCard.appendChild(title);
+      eventCard.appendChild(toggleButton);
+      eventCard.appendChild(participantListContainer);
+      middleSection.appendChild(eventCard);
+    }
+  }
+
+// **Logout Function**
 logoutBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to logout?")) {
         signOut(auth).then(() => {
