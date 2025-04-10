@@ -909,7 +909,6 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
     }
 });
 
-
 // Populate filters on page load
 async function populateFilters() {
     const skillLevels = ["Beginner", "Intermediate", "Advanced"];
