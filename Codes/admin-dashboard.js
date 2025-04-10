@@ -103,8 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     
-        const attendingEvents = attendingIds.map(id => idToEvent[id]).filter(Boolean);
-        const canceledEvents = canceledIds.map(id => idToEvent[id]).filter(Boolean);
+        // 👉 Inject "status" property for filtering later
+        const attendingEvents = attendingIds.map(id => ({ ...idToEvent[id], status: "attending" })).filter(Boolean);
+        const canceledEvents = canceledIds.map(id => ({ ...idToEvent[id], status: "not attending" })).filter(Boolean);
+    
+        // Save globally if needed for search filtering
+        events = [...attendingEvents, ...canceledEvents];
     
         middleSection.innerHTML = `
             <div class="header-container">
@@ -118,10 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div id="canceledWrapper"></div>
         `;
     
-        // Reuse updateEventList but pass different containers
         updateEventList(attendingEvents, "attendingWrapper");
         updateEventList(canceledEvents, "canceledWrapper");
     }
+    
     
     
     
@@ -771,6 +775,9 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
 
     let filteredData = [];
 
+    // 🔄 Clear old "no results" messages
+    document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
+
     switch (currentSection) {
         case "events":
             filteredData = events.filter(event => {
@@ -786,27 +793,18 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
                 );
             });
             updateEventList(filteredData, "eventsWrapper");
+
+            if (filteredData.length === 0) {
+                const msg = document.createElement("p");
+                msg.className = "no-results-msg";
+                msg.textContent = "No events match your search.";
+                msg.style.textAlign = "center";
+                document.getElementById("eventsWrapper").appendChild(msg);
+            }
             break;
 
-            case "my-events":
-                filteredData = events.filter(event => {
-                    return (
-                        (event.title || "").toLowerCase().includes(query) ||
-                        (event.date || "").toLowerCase().includes(query) ||
-                        (event.time || "").toLowerCase().includes(query) ||
-                        (event.location || "").toLowerCase().includes(query) ||
-                        (event.area || "").toLowerCase().includes(query) ||
-                        (event.city || "").toLowerCase().includes(query) ||
-                        (event.skillLevel || "").toLowerCase().includes(query) ||
-                        (event.sportCategory || "").toLowerCase().includes(query)
-                    );
-                });
-                updateEventList(filteredData, "eventsWrapper");
-                break;
-
-        case "attending":
-            const attendingEvents = events.filter(event => event.status === "attending");
-            filteredData = attendingEvents.filter(event => {
+        case "my-events":
+            filteredData = events.filter(event => {
                 return (
                     (event.title || "").toLowerCase().includes(query) ||
                     (event.date || "").toLowerCase().includes(query) ||
@@ -818,27 +816,99 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
                     (event.sportCategory || "").toLowerCase().includes(query)
                 );
             });
-            updateEventList(filteredData, "attendingWrapper");
+            updateEventList(filteredData, "eventsWrapper");
+
+            if (filteredData.length === 0) {
+                const msg = document.createElement("p");
+                msg.className = "no-results-msg";
+                msg.textContent = "No events match your search.";
+                msg.style.textAlign = "center";
+                document.getElementById("eventsWrapper").appendChild(msg);
+            }
+            break;
+
+        case "attending":
+            const attendingFiltered = events
+                .filter(event => event.status === "attending")
+                .filter(event => {
+                    return (
+                        (event.title || "").toLowerCase().includes(query) ||
+                        (event.date || "").toLowerCase().includes(query) ||
+                        (event.time || "").toLowerCase().includes(query) ||
+                        (event.location || "").toLowerCase().includes(query) ||
+                        (event.area || "").toLowerCase().includes(query) ||
+                        (event.city || "").toLowerCase().includes(query) ||
+                        (event.skillLevel || "").toLowerCase().includes(query) ||
+                        (event.sportCategory || "").toLowerCase().includes(query)
+                    );
+                });
+
+            const notAttendingFiltered = events
+                .filter(event => event.status === "not attending")
+                .filter(event => {
+                    return (
+                        (event.title || "").toLowerCase().includes(query) ||
+                        (event.date || "").toLowerCase().includes(query) ||
+                        (event.time || "").toLowerCase().includes(query) ||
+                        (event.location || "").toLowerCase().includes(query) ||
+                        (event.area || "").toLowerCase().includes(query) ||
+                        (event.city || "").toLowerCase().includes(query) ||
+                        (event.skillLevel || "").toLowerCase().includes(query) ||
+                        (event.sportCategory || "").toLowerCase().includes(query)
+                    );
+                });
+
+            updateEventList(attendingFiltered, "attendingWrapper");
+            updateEventList(notAttendingFiltered, "canceledWrapper");
+
+            if (attendingFiltered.length === 0) {
+                const msg = document.createElement("p");
+                msg.className = "no-results-msg";
+                msg.textContent = "No attending events match your search.";
+                msg.style.textAlign = "center";
+                document.getElementById("attendingWrapper").appendChild(msg);
+            }
+
+            if (notAttendingFiltered.length === 0) {
+                const msg = document.createElement("p");
+                msg.className = "no-results-msg";
+                msg.textContent = "No canceled events match your search.";
+                msg.style.textAlign = "center";
+                document.getElementById("canceledWrapper").appendChild(msg);
+            }
             break;
 
         case "sports":
         case "cities":
         case "areas":
             const adminListItems = Array.from(document.querySelectorAll(".admin-item span"));
+            let matchFound = false;
             adminListItems.forEach(item => {
                 const parent = item.parentElement;
                 if (item.textContent.toLowerCase().includes(query)) {
                     parent.style.display = "block";
+                    matchFound = true;
                 } else {
                     parent.style.display = "none";
                 }
             });
+
+            if (!matchFound) {
+                const msg = document.createElement("p");
+                msg.className = "no-results-msg";
+                msg.textContent = `No ${currentSection} match your search.`;
+                msg.style.textAlign = "center";
+                const listContainer = document.querySelector(".admin-list");
+                if (listContainer) listContainer.appendChild(msg);
+            }
+
             break;
 
         default:
             console.log("Search is not supported for this section.");
     }
 });
+
 
 // Populate filters on page load
 async function populateFilters() {
