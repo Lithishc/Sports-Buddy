@@ -2,7 +2,6 @@
 
 **Sports Buddy** is a community-focused web app that helps users find, join, and manage local sports events based on their interests and skill levels. It connects sports enthusiasts and encourages social interaction through organized activities.
 
----
 
 ## 🚀 Features
 
@@ -23,7 +22,6 @@
 - Users can update preferences directly
 - Updated values are saved to Firestore
 
----
 
 ## 🧱 Tech Stack
 
@@ -35,7 +33,6 @@
 | Hosting     | Firebase Hosting |
 | UI Style    | Glassmorphism, Responsive Design |
 
----
 ## To Run
 -Open the Login.html in Codes Folder with live server in VScode.
 
