@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
         // ✅ **Render Events & Add "Add Event" Button**
         function renderEvents() {
-            if (currentSection !== "events" && currentSection !== "my-events") return; // Ensure this function only runs for the "events" section
+            if (currentSection == "events" ){// Ensure this function only runs for the "events" section
         
             middleSection.innerHTML = `
                 <div class="header-container">
@@ -142,16 +142,22 @@ document.addEventListener("DOMContentLoaded", () => {
         
             document.getElementById("AddeventBtn").addEventListener("click", showAddEventForm);
             updateEventList(events, "eventsWrapper"); // Update the event list for the "events" section
-        }
-        function renderMyEvents() {
-            middleSection.innerHTML = `
-                <div class="header-container">
-                    <h2>My Events</h2>
-                </div>
-                <div id="myEventsWrapper"></div>
-            `;
-        
-            updateEventList(events, "myEventsWrapper"); // Update the event list with only the user's events
+            }
+            else if(currentSection == "my-events"){
+                middleSection.innerHTML = `
+                    <div class="header-container">
+                        <h2>My Events</h2>
+                        <button id="AddeventBtn">Add Event</button>
+                    </div>
+                    <div id="eventsWrapper"></div>
+                `;
+                document.getElementById("AddeventBtn").addEventListener("click", showAddEventForm);
+                updateEventList(events, "eventsWrapper"); // Update the event list with only the user's events
+            }
+            else{
+                return;
+            }
+    
         }
     
         // ✅ **Update Event List**
@@ -548,8 +554,8 @@ document.addEventListener("DOMContentLoaded", () => {
                        renderAttendingEvents(); // Fetch attending and not attending events
                        break;
                    case "my-events":
+                       renderEvents(); // Render the My Events section
                        fetchEvents(true); // Fetch only the user's events
-                       renderMyEvents(); // Render the My Events section
                        break;
                    default:
                        middleSection.innerHTML = `<h2>Coming Soon</h2>`;
@@ -655,6 +661,22 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
             });
             updateEventList(filteredData, "eventsWrapper");
             break;
+
+            case "my-events":
+                filteredData = events.filter(event => {
+                    return (
+                        (event.title || "").toLowerCase().includes(query) ||
+                        (event.date || "").toLowerCase().includes(query) ||
+                        (event.time || "").toLowerCase().includes(query) ||
+                        (event.location || "").toLowerCase().includes(query) ||
+                        (event.area || "").toLowerCase().includes(query) ||
+                        (event.city || "").toLowerCase().includes(query) ||
+                        (event.skillLevel || "").toLowerCase().includes(query) ||
+                        (event.sportCategory || "").toLowerCase().includes(query)
+                    );
+                });
+                updateEventList(filteredData, "eventsWrapper");
+                break;
 
         case "attending":
             const attendingEvents = events.filter(event => event.status === "attending");

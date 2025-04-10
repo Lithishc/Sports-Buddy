@@ -3,6 +3,7 @@
 
 # But do NOT ignore the Codes folder
 !Codes/
+!Codes/** 
 
 # Also, do not ignore this .gitignore file itself
 !.gitignore

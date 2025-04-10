@@ -1,0 +1,605 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left Section */
+.left-section {
+    width: 250px; /* Fixed width for the left section */
+    background: rgba(255, 255, 255, 0.7); /* Glassmorphism effect */
+    border-radius: 12px;
+    padding: 20px;
+    flex-shrink: 0; /* Prevent shrinking */
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.left-section h1 {
+    text-align: left;
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #4b4b4b;
+}
+.user-container {
+    display: flex; /* Use flexbox to align items horizontally */
+    justify-content: space-between; /* Space out the admin name and pill */
+    align-items: center; /* Vertically align items */
+    margin-bottom: 50px; /* Add spacing below the admin container */
+    gap: 10px; /* Add spacing between the admin name and pill */
+}
+
+.user-pill {
+    display: inline-block; /* Ensures the pill only takes up as much space as its content */
+    background-color: #8fe92e53; /* Light gray background for the pill */
+    color: #333333; /* Text color */
+    padding: 4px 10px; /* Padding inside the pill */
+    border-radius: 50px; /* Rounded corners for the pill */
+    font-size: 14px; /* Font size for the pill text */
+    font-weight: 500; /* Slightly bold text */
+    margin-top: 0; /* No extra spacing above the pill */
+    white-space: nowrap; /* Prevents the pill content from wrapping to the next line */
+    width: auto; /* Ensures the pill width adjusts to its content */
+    text-align: center; /* Centers the text inside the pill */
+    align-self: flex-start; /* Aligns the pill to the left side of the card */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#userName {
+    font-size: 18px; /* Font size for the admin name */
+    font-weight: bold;
+    color: #333; /* Darker text color */
+    margin: 0; /* Remove default margin */
+    text-align: left; /* Align text to the left */
+}
+
+.list-section {
+    margin-top: 20px;
+}
+
+
+.list-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.list-section ul li {
+    background: rgba(255, 255, 255, 0.2); /* Glass effect */
+    backdrop-filter: blur(10px);
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #222;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    text-align: left;
+}
+
+/* Hover effect */
+.list-section ul li:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar-item.active {
+    background-color: #b9bdc24a;
+    color: rgb(0, 0, 0);
+}
+
+
+
+
+/* Middle Section */
+.middle-section {
+    flex-grow: 1; /* Allow the middle section to take up remaining space */
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.7); /* Glassmorphism effect */
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 0 5px; /* Add spacing between sections */
+}
+
+.middle-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #4b4b4b;
+}
+
+.header-container {
+    display: flex; /* Use flexbox to align items */
+    justify-content: space-between; /* Space out the heading and button */
+    align-items: center; /* Vertically align items */
+    margin-bottom: 20px; /* Add spacing below the header */
+}
+
+#AddeventBtn, #confirmAddBtn {
+    background: rgba(255, 255, 255, 0.7); /* Glassmorphism effect */
+    color: #333; /* Text color */
+    padding: 10px 20px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 50px; /* Pill shape */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    backdrop-filter: blur(10px); /* Glass effect */
+    font-size: 14px; /* Font size for the button text */
+    font-weight: 500; /* Slightly bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+#AddeventBtn:hover, #confirmAddBtn:hover {
+    background: rgba(255, 255, 255, 0.9); /* Slightly brighter on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+.event-badge {
+    display: inline-block;
+    margin-left: 10px;
+    background-color: #8fe92e53;
+    color: rgb(0, 0, 0);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 12px;
+    vertical-align: middle;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.event-card {
+    background-color: #ffffff; /* Solid white background */
+    padding: 10px 20px; /* Padding inside the card */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin: 10px; /* Center the card horizontally */
+    font-family: 'Arial', sans-serif; /* Consistent font */
+    color: #333; /* Text color */
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Consistent spacing between elements */
+    min-height: 200px; /* Minimum vertical size */
+    position: relative; 
+}
+
+.event-card h2 {
+    font-size: 24px; /* Font size for the title */
+    font-weight: bold;
+    color: #000; /* Darker text for the title */
+    margin-top: 5px;
+    margin-bottom: 5px; /* Reduced spacing below the title */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect for the text */
+}
+
+.event-card .pill {
+    display: inline-block; /* Ensures the pill only takes up as much space as its content */
+    background-color: #e0e0e0; /* Light gray background for the pill */
+    color: #333; /* Text color */
+    padding: 4px 10px; /* Padding inside the pill */
+    border-radius: 50px; /* Rounded corners for the pill */
+    font-size: 14px; /* Font size for the pill text */
+    font-weight: 500; /* Slightly bold text */
+    margin-top: 0; /* No extra spacing above the pill */
+    margin-bottom: 10px; /* Consistent spacing below the pill */
+    white-space: nowrap; /* Prevents the pill content from wrapping to the next line */
+    width: auto; /* Ensures the pill width adjusts to its content */
+    text-align: center; /* Centers the text inside the pill */
+    align-self: flex-start; /* Aligns the pill to the left side of the card */
+}
+
+.event-card p {
+    font-size: 16px; /* Font size for paragraph text */
+    color: #555; /* Slightly lighter text for secondary information */
+    margin: 5px 0; /* Consistent spacing between paragraphs */
+}
+
+.event-card p strong {
+    font-weight: bold;
+    font-size: 16px;
+    color: #000; /* Strong emphasis for labels */
+}
+.event-card .location {
+    position: absolute; /* Position the location text */
+    bottom: 10px; /* Align to the bottom of the card */
+    left: 20px; /* Align to the left of the card */
+    font-size: 14px; /* Slightly smaller font size */
+    color: #333; /* Text color */
+}
+
+.attend-btn {
+    position: absolute; /* Position the button */
+    bottom: 10px; /* Align to the bottom of the card */
+    right: 20px; /* Align to the right of the card */
+    background: rgba(73, 194, 246, 0.174); /* Glassmorphism effect */
+    color: #333; /* Text color */
+    padding: 10px 15px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 50px; /* Pill shape */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    backdrop-filter: blur(10px); /* Glass effect */
+    font-size: 22px; /* Font size for the button text */
+    font-weight: 600; /* Slightly bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.attend-btn:hover {
+    background: rgba(255, 255, 255, 0.9); /* Slightly brighter on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+
+/* New Event Form */
+.new-event-form {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    gap: 20px; /* Add spacing between elements */
+    padding: 30px 20px 100px;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.event-title-input {
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+
+.event-date-input {
+    background-color: #f0f0f0; /* light grey */
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  max-width: 250px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.event-date-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.event-date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.3);
+    cursor: pointer;
+}
+
+/* Event Description */
+.event-description {
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 20px; /* Add spacing below the description */
+    outline: none;
+    resize: none;
+    font-size: 14px;
+    color: #333;
+    min-height: 70px; /* Set a minimum height for the description box */
+}
+
+/* Location, Area, and City Section */
+.location {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    gap: 15px; /* Add spacing between inputs */
+    align-items: center; /* Align inputs vertically */
+    margin-bottom: 20px; /* Add spacing below the location section */
+}
+
+/* Inputs for Location, Area, and City */
+.event-location,
+.event-area,
+.event-city ,
+#sportCategoryInput,
+.event-skill-level{
+    flex: 1; /* Make inputs take equal space */
+    min-width: 150px; /* Ensure a minimum width for smaller screens */
+    padding: 5px 5px; /* Add padding inside inputs */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 10px; /* Rounded corners */
+    background: #f0f0f0; /* Light gray background */
+    font-size: 14px; /* Font size for input text */
+    outline: none; /* Remove default outline */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effect */
+}
+
+.event-location:focus,
+.event-area:focus,
+.event-city:focus ,
+#sportCategoryInput:focus,
+.event-skill-level:focus {
+    border-color: #007bff; /* Blue border on focus */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Subtle shadow on focus */
+}
+.category-skill {
+    display: flex; /* Use flexbox for side-by-side alignment */
+    gap: 20px; /* Add spacing between category and skill level */
+    align-items: center; /* Align items vertically */
+    margin-bottom: 10px; /* Add spacing below the section */
+}
+
+.category-skill p {
+    margin: 0; /* Remove default margin */
+    font-size: 14px; /* Match font size with other text */
+    color: #333; /* Text color */
+    flex: 1; /* Ensure equal space for both elements */
+}
+
+/* Publish Button */
+.publish-btn {
+    align-self: flex-end; /* Align the button to the right */
+    background: rgba(73, 194, 246, 0.174);
+    color: #333;
+    padding: 12px 25px; /* Adjust padding for better appearance */
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    font-size: 22px; /* Adjust font size */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.publish-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+.cancel-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    font-size: 16px;
+    padding: 10px 10px;
+    border-radius: 20px;
+    font-weight: 550;
+    cursor: pointer;
+  }
+  .cancel-btn:hover {
+    background: rgb(235, 54, 54);
+}
+  
+
+
+#newItemInput{
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.delete-btn,#cancelAddBtn {
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.delete-btn:hover ,#cancelAddBtn:hover {
+    background: #e60000;
+}
+/* Event Card Delete Button */
+.event-delete-btn {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.event-delete-btn:hover {
+    background: #e60000;
+}
+
+#addBtn {
+    background: rgba(255, 255, 255, 0.7);
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#addBtn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Right Section */
+.right-section {
+    width: 250px; /* Fixed width for the right section */
+    background: rgba(255, 255, 255, 0.7); /* Glassmorphism effect */
+    border-radius: 12px;
+    padding: 20px;
+    flex-shrink: 0; /* Prevent shrinking */
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    
+}
+
+#logoutBtn {
+    background-color: #ea2d26; /* Red background for logout */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 50px; /* Pill shape */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    backdrop-filter: blur(10px); /* Glass effect */
+    font-size: 16px; /* Font size for the button text */
+    font-weight: 500; /* Slightly bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    align-self: flex-end; /* Align the button to the right */
+}
+
+#logoutBtn:hover {
+    background: rgba(255, 255, 255, 0.9); /* Slightly brighter on hover */
+    background-color: #c9302c; /* Darker red on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+#filterInput {
+    width: 85%; /* Make the input take full width */
+    padding: 12px; /* Padding for the input field */
+    border: 1px solid #ccc; /* Border for the input field */
+    border-radius: 12px; /* Rounded corners for input */
+    font-size: 16px; /* Font size for the input text */
+    background-color: rgba(255, 255, 255, 0.8); /* Slight transparency */
+    transition: border-color 0.3s; /* Smooth transition for focus effect */
+}
+
+#filterInput:focus {
+    border-color: #007bff; /* Blue border on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Filters Section */
+.filter-dropdown {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: border-color 0.3s;
+}
+
+.filter-dropdown:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.filter-buttons {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center the buttons horizontally */
+    align-items: center; /* Align the buttons vertically */
+    gap: 15px; /* Add spacing between the buttons */
+    margin-top: 10px; /* Add spacing above the buttons */
+}
+
+.apply-filters-btn,
+.reset-filters-btn {
+    flex: 0 0 auto; /* Prevent buttons from stretching */
+    text-align: center; /* Center the text inside the buttons */
+    padding: 10px 20px; /* Adjust padding for better appearance */
+    font-size: 14px; /* Slightly smaller font size for a refined look */
+    font-weight: 600; /* Bold text for emphasis */
+    border-radius: 50px; /* Pill-shaped buttons */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    border: none; /* Remove the black border */
+}
+
+.filter-pill {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-pill:hover {
+    background-color: #d6d6d6;
+}
+
+.apply-filters-btn {
+    background: rgba(73, 194, 246, 0.2); /* Light blue background */
+    color: #333; /* Dark text color */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.apply-filters-btn:hover {
+    background: rgba(73, 194, 246, 0.4); /* Darker blue on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+.reset-filters-btn {
+    background: rgba(255, 77, 79, 0.2); /* Light red background */
+    color: #333; /* Dark text color */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.reset-filters-btn:hover {
+    background: rgba(255, 77, 79, 0.4); /* Darker red on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .left-section,
+    .right-section {
+        width: 100%;
+    }
+
+    .middle-section {
+        padding: 15px;
+    }
+
+    .event-card {
+        padding: 10px;
+    }
+}

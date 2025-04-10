@@ -1,0 +1,146 @@
+/* General Styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff, #fad0c4);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container Styling */
+.container {
+    display: flex;
+    width: 800px;
+    height: 600px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Left Section */
+.left-section {
+    flex: 1;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.left-section h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.left-section p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Right Section */
+.right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.right-section h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Form Styling */
+#registerForm {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Consistent spacing between elements */
+}
+
+#registerForm input,
+#registerForm select,
+#registerForm button {
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: #f0f0f0;
+    font-size: 14px;
+    outline: none;
+    text-indent: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown Styling */
+#registerForm select {
+    width: 100%;
+    appearance: none; /* Remove default dropdown styling */
+    background: #f0f0f0 
+}
+
+.custom-multiselect {
+    position: relative;
+    border-radius: 30px;
+    background: #f0f0f0;
+    font-size: 14px;
+    padding:12px 16px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.multiselect-input::after { 
+    float: right;
+    margin-right: 10px;
+    color: gray;
+}
+
+.multiselect-options {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    max-height: 150px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+.multiselect-options label {
+    display: block;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.multiselect-options label:hover {
+    background-color: #f5f5f5;
+}
+
+
+/* Button Styling */
+#registerForm button {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#registerForm button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
