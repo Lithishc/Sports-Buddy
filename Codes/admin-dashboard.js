@@ -1058,6 +1058,7 @@ setupMultiSelect("sportsCategoryFilter", "sportsCategory");
 setupMultiSelect("cityFilter", "city");
 setupMultiSelect("areaFilter", "area");
 
+
 // Firestore Event Fetch
 fetchEvents();
 
