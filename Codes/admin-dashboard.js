@@ -127,10 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     
-    
-    
-    
-
 
     //**Render Events & Add "Add Event" Button**
     function renderEvents() {
@@ -405,7 +401,7 @@ function showEditEventForm(event) {
         const areas = [];
         const cities = [];
         const sportsCategories = [];
-        const skillLevels = ["Beginner", "Intermediate", "Advanced"]; // Static skill levels
+        const skillLevels = ["Beginner", "Intermediate", "Advanced"]; 
     
         const areaSnapshot = await getDocs(collection(db, "areas"));
         const citySnapshot = await getDocs(collection(db, "cities"));
@@ -610,7 +606,7 @@ async function renderAdminList(title, collectionName) {
         items.push({ id: docSnap.id, name: docSnap.data().name });
     });
 
-    // ✅ Restore alphabetical sorting
+    //  Restore alphabetical sorting
     items.sort((a, b) => a.name.localeCompare(b.name));
 
     const listContainer = document.getElementById("adminList");
@@ -638,7 +634,7 @@ items.forEach(item => {
 });
 
 
-    // ✅ Handle delete functionality
+    //  Handle delete functionality
     listContainer.addEventListener("click", async (e) => {
         if (e.target.classList.contains("delete-btn")) {
             const id = e.target.getAttribute("data-id");
@@ -651,7 +647,6 @@ items.forEach(item => {
     });
 }
 
-// ✅ Keep the existing input UI unchanged
 function showInputField(collectionName) {
     if (document.querySelector(".new-item-input")) return; // Prevent duplicate input fields
 
@@ -671,7 +666,7 @@ function showInputField(collectionName) {
     document.getElementById("cancelAddBtn").addEventListener("click", () => inputItem.remove());
 }
 
-// ✅ Fix singularization
+// Fix singularization
 function formatSingular(collectionName) {
     if (collectionName === "sports_categories") return "Category";
     if (collectionName === "cities") return "City";
@@ -679,7 +674,7 @@ function formatSingular(collectionName) {
     return collectionName.slice(0, -1);
 }
 
-// ✅ Add new item while keeping sorting intact
+// Add new item while keeping sorting intact
 function addItem(collectionName) {
     const inputField = document.getElementById("newItemInput");
     const inputName = inputField.value.trim();
@@ -734,7 +729,7 @@ async function toggleAttendance(eventId, isAttending, docId) {
             });
         }
 
-        // ✅ Only refresh the current section
+        // Only refresh the current section
         switch (currentSection) {
             case "events":
                 fetchEvents();
@@ -841,7 +836,7 @@ async function loadparticipants() {
 
 
 
-    // ✅ **Logout Function**
+    // **Logout Function**
     logoutBtn.addEventListener("click", () => {
         if (confirm("Are you sure you want to logout?")) {
             signOut(auth).then(() => {
@@ -862,7 +857,7 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
 
     let filteredData = [];
 
-    // 🔄 Clear old "no results" messages
+    // Clear old "no results" messages
     document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
 
     switch (currentSection) {

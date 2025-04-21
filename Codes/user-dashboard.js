@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const actionButton = document.createElement("button");
                         actionButton.classList.add("attend-btn");
                 
-                        // ✅ Only show Edit/Delete if in "my-events" section and user is the creator
+                        //  Only show Edit/Delete if in "my-events" section and user is the creator
                         if (currentSection === "my-events" && isCreator) {
                             const deleteButton = document.createElement("button");
                             deleteButton.classList.add("event-delete-btn");
@@ -492,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
            }
        
-           // ✅ **Publish Event to Firestore**
+           // **Publish Event to Firestore**
            async function publishEvent() {
                const title = document.getElementById("eventTitle").value.trim();
                const dateTime = document.getElementById("eventDateTime").value;
@@ -561,7 +561,7 @@ document.addEventListener("DOMContentLoaded", () => {
                        renderEvents(); // Render the My Events section
                        fetchEvents(true); // Fetch only the user's events
                        break;
-                    case "my-events":
+                    case "participants":
                         loadparticipants(); // Load participants for the user's created events
                         break;
                    default:
@@ -614,7 +614,7 @@ async function toggleAttendance(eventId, isAttending, docId) {
             });
         }
 
-        // ✅ Only refresh the current section
+        // Only refresh the current section
         switch (currentSection) {
             case "events":
                 fetchEvents();
@@ -715,7 +715,6 @@ async function loadparticipants() {
       middleSection.appendChild(eventCard);
     }
   }
-
 // **Logout Function**
 logoutBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to logout?")) {
@@ -737,7 +736,7 @@ document.getElementById("filterInput").addEventListener("input", (e) => {
 
     let filteredData = [];
 
-    // 🔄 Clear old "no results" messages
+    // Clear old "no results" messages
     document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
 
     switch (currentSection) {
