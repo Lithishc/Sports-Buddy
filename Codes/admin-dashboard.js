@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let events = [];
     let currentSection = "events"; // default section
 
+    const selectedFilters = {
+        skill: [],
+        sportsCategory: [],
+        city: [],
+        area: []
+    };
+    
+
 
     // **Fetch Admin Name**
     onAuthStateChanged(auth, async (user) => {
@@ -852,143 +860,117 @@ async function loadparticipants() {
 //Right Section
 
 //right section search and filter code
-document.getElementById("filterInput").addEventListener("input", (e) => {
-    const query = e.target.value.toLowerCase();
+function applyCombinedFiltersAndSearch() {
+    const query = document.getElementById("filterInput").value.toLowerCase();
 
-    let filteredData = [];
+    //Filter based on selected filters
+    let filtered = events.filter(event => {
+        return (
+            (!selectedFilters.skill.length || selectedFilters.skill.includes(event.skillLevel)) &&
+            (!selectedFilters.sportsCategory.length || selectedFilters.sportsCategory.includes(event.sportCategory)) &&
+            (!selectedFilters.city.length || selectedFilters.city.includes(event.city)) &&
+            (!selectedFilters.area.length || selectedFilters.area.includes(event.area))
+        );
+    });
+
+    // Apply search on filtered data
+    if (query) {
+        filtered = filtered.filter(event => {
+            return (
+                (event.title || "").toLowerCase().includes(query) ||
+                (event.date || "").toLowerCase().includes(query) ||
+                (event.time || "").toLowerCase().includes(query) ||
+                (event.location || "").toLowerCase().includes(query) ||
+                (event.area || "").toLowerCase().includes(query) ||
+                (event.city || "").toLowerCase().includes(query) ||
+                (event.skillLevel || "").toLowerCase().includes(query) ||
+                (event.sportCategory || "").toLowerCase().includes(query)
+            );
+        });
+    }
+
+    //Remove duplicates based on event.id
+    const uniqueEvents = Array.from(new Map(filtered.map(e => [e.id, e])).values());
+
+    //Display based on section
+    const eventsWrapper = document.getElementById("eventsWrapper");
+    const attendingWrapper = document.getElementById("attendingWrapper");
+    const canceledWrapper = document.getElementById("canceledWrapper");
 
     // Clear old "no results" messages
     document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
 
-    switch (currentSection) {
-        case "events":
-            filteredData = events.filter(event => {
-                return (
-                    (event.title || "").toLowerCase().includes(query) ||
-                    (event.date || "").toLowerCase().includes(query) ||
-                    (event.time || "").toLowerCase().includes(query) ||
-                    (event.location || "").toLowerCase().includes(query) ||
-                    (event.area || "").toLowerCase().includes(query) ||
-                    (event.city || "").toLowerCase().includes(query) ||
-                    (event.skillLevel || "").toLowerCase().includes(query) ||
-                    (event.sportCategory || "").toLowerCase().includes(query)
-                );
-            });
-            updateEventList(filteredData, "eventsWrapper");
+    if (currentSection === "events" || currentSection === "my-events") {
+        updateEventList(uniqueEvents, "eventsWrapper");
+        if (uniqueEvents.length === 0) {
+            const msg = document.createElement("p");
+            msg.className = "no-results-msg";
+            msg.textContent = "No events match your search.";
+            msg.style.textAlign = "center";
+            eventsWrapper.appendChild(msg);
+        }
+    } else if (currentSection === "attending") {
+        const attendingFiltered = uniqueEvents.filter(e => e.status === "attending");
+        const notAttendingFiltered = uniqueEvents.filter(e => e.status === "not attending");
 
-            if (filteredData.length === 0) {
-                const msg = document.createElement("p");
-                msg.className = "no-results-msg";
-                msg.textContent = "No events match your search.";
-                msg.style.textAlign = "center";
-                document.getElementById("eventsWrapper").appendChild(msg);
-            }
-            break;
+        updateEventList(attendingFiltered, "attendingWrapper");
+        updateEventList(notAttendingFiltered, "canceledWrapper");
 
-        case "my-events":
-            filteredData = events.filter(event => {
-                return (
-                    (event.title || "").toLowerCase().includes(query) ||
-                    (event.date || "").toLowerCase().includes(query) ||
-                    (event.time || "").toLowerCase().includes(query) ||
-                    (event.location || "").toLowerCase().includes(query) ||
-                    (event.area || "").toLowerCase().includes(query) ||
-                    (event.city || "").toLowerCase().includes(query) ||
-                    (event.skillLevel || "").toLowerCase().includes(query) ||
-                    (event.sportCategory || "").toLowerCase().includes(query)
-                );
-            });
-            updateEventList(filteredData, "eventsWrapper");
+        if (attendingFiltered.length === 0) {
+            const msg = document.createElement("p");
+            msg.className = "no-results-msg";
+            msg.textContent = "No attending events match your search.";
+            msg.style.textAlign = "center";
+            attendingWrapper.appendChild(msg);
+        }
 
-            if (filteredData.length === 0) {
-                const msg = document.createElement("p");
-                msg.className = "no-results-msg";
-                msg.textContent = "No events match your search.";
-                msg.style.textAlign = "center";
-                document.getElementById("eventsWrapper").appendChild(msg);
-            }
-            break;
-
-        case "attending":
-            const attendingFiltered = events
-                .filter(event => event.status === "attending")
-                .filter(event => {
-                    return (
-                        (event.title || "").toLowerCase().includes(query) ||
-                        (event.date || "").toLowerCase().includes(query) ||
-                        (event.time || "").toLowerCase().includes(query) ||
-                        (event.location || "").toLowerCase().includes(query) ||
-                        (event.area || "").toLowerCase().includes(query) ||
-                        (event.city || "").toLowerCase().includes(query) ||
-                        (event.skillLevel || "").toLowerCase().includes(query) ||
-                        (event.sportCategory || "").toLowerCase().includes(query)
-                    );
-                });
-
-            const notAttendingFiltered = events
-                .filter(event => event.status === "not attending")
-                .filter(event => {
-                    return (
-                        (event.title || "").toLowerCase().includes(query) ||
-                        (event.date || "").toLowerCase().includes(query) ||
-                        (event.time || "").toLowerCase().includes(query) ||
-                        (event.location || "").toLowerCase().includes(query) ||
-                        (event.area || "").toLowerCase().includes(query) ||
-                        (event.city || "").toLowerCase().includes(query) ||
-                        (event.skillLevel || "").toLowerCase().includes(query) ||
-                        (event.sportCategory || "").toLowerCase().includes(query)
-                    );
-                });
-
-            updateEventList(attendingFiltered, "attendingWrapper");
-            updateEventList(notAttendingFiltered, "canceledWrapper");
-
-            if (attendingFiltered.length === 0) {
-                const msg = document.createElement("p");
-                msg.className = "no-results-msg";
-                msg.textContent = "No attending events match your search.";
-                msg.style.textAlign = "center";
-                document.getElementById("attendingWrapper").appendChild(msg);
-            }
-
-            if (notAttendingFiltered.length === 0) {
-                const msg = document.createElement("p");
-                msg.className = "no-results-msg";
-                msg.textContent = "No canceled events match your search.";
-                msg.style.textAlign = "center";
-                document.getElementById("canceledWrapper").appendChild(msg);
-            }
-            break;
-
-        case "sports":
-        case "cities":
-        case "areas":
-            const adminListItems = Array.from(document.querySelectorAll(".admin-item span"));
-            let matchFound = false;
-            adminListItems.forEach(item => {
-                const parent = item.parentElement;
-                if (item.textContent.toLowerCase().includes(query)) {
-                    parent.style.display = "block";
-                    matchFound = true;
-                } else {
-                    parent.style.display = "none";
-                }
-            });
-
-            if (!matchFound) {
-                const msg = document.createElement("p");
-                msg.className = "no-results-msg";
-                msg.textContent = `No ${currentSection} match your search.`;
-                msg.style.textAlign = "center";
-                const listContainer = document.querySelector(".admin-list");
-                if (listContainer) listContainer.appendChild(msg);
-            }
-
-            break;
-
-        default:
-            console.log("Search is not supported for this section.");
+        if (notAttendingFiltered.length === 0) {
+            const msg = document.createElement("p");
+            msg.className = "no-results-msg";
+            msg.textContent = "No canceled events match your search.";
+            msg.style.textAlign = "center";
+            canceledWrapper.appendChild(msg);
+        }
     }
+    else if (["sports", "cities", "areas"].includes(currentSection)) {
+    const adminListItems = Array.from(document.querySelectorAll(".admin-item span"));
+    let matchFound = false;
+
+    adminListItems.forEach(item => {
+        const parent = item.parentElement;
+        if ((item.textContent || "").toLowerCase().includes(query)) {
+            parent.style.display = "block";
+            matchFound = true;
+        } else {
+            parent.style.display = "none";
+        }
+    });
+
+    // Remove any previous no-result messages
+    document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
+
+    if (!matchFound) {
+        const msg = document.createElement("p");
+        msg.className = "no-results-msg";
+        msg.textContent = `No ${currentSection} match your search.`;
+        msg.style.textAlign = "center";
+
+        const listContainer = document.querySelector(".admin-list");
+        if (listContainer) listContainer.appendChild(msg);
+    }
+}
+
+}
+
+
+document.getElementById("filterInput").addEventListener("input", applyCombinedFiltersAndSearch);
+
+// Reset Filters Button
+document.getElementById("resetFiltersBtn").addEventListener("click", () => {
+    Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
+    document.getElementById("filterInput").value = "";
+    updateActiveFilters();
+    updateFilteredUI(events);
 });
 
 // Populate filters on page load
@@ -998,7 +980,6 @@ async function populateFilters() {
     const cities = [];
     const areas = [];
 
-    // Fetch dropdown data from Firestore
     const categorySnapshot = await getDocs(collection(db, "sports_categories"));
     const citySnapshot = await getDocs(collection(db, "cities"));
     const areaSnapshot = await getDocs(collection(db, "areas"));
@@ -1007,14 +988,13 @@ async function populateFilters() {
     citySnapshot.forEach(docSnap => cities.push(docSnap.data().name));
     areaSnapshot.forEach(docSnap => areas.push(docSnap.data().name));
 
-    // Populate dropdowns
     populateDropdown("skillFilter", skillLevels);
     populateDropdown("sportsCategoryFilter", sportsCategories);
     populateDropdown("cityFilter", cities);
     populateDropdown("areaFilter", areas);
 }
 
-// Helper function to populate dropdowns
+// Dropdown helpers
 function populateDropdown(dropdownId, options) {
     const dropdown = document.getElementById(dropdownId);
     options.forEach(option => {
@@ -1025,100 +1005,60 @@ function populateDropdown(dropdownId, options) {
     });
 }
 
-// Handle active filters
-function updateActiveFilters() {
-    const activeFiltersContainer = document.getElementById("activeFilters");
-    activeFiltersContainer.innerHTML = ""; // Clear existing filters
-
-    const filters = {
-        skill: document.getElementById("skillFilter").value,
-        sportsCategory: document.getElementById("sportsCategoryFilter").value,
-        city: document.getElementById("cityFilter").value,
-        area: document.getElementById("areaFilter").value
-    };
-
-    Object.keys(filters).forEach(key => {
-        if (filters[key]) {
-            const pill = document.createElement("div");
-            pill.classList.add("filter-pill");
-            pill.textContent = filters[key];
-            pill.addEventListener("click", () => {
-                document.getElementById(`${key}Filter`).value = ""; // Reset filter
-                updateActiveFilters(); // Update active filters
-            });
-            activeFiltersContainer.appendChild(pill);
+// Multi-select dropdown logic
+function setupMultiSelect(dropdownId, filterKey) {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.addEventListener("change", () => {
+        const val = dropdown.value;
+        if (val && !selectedFilters[filterKey].includes(val)) {
+            selectedFilters[filterKey].push(val);
+            dropdown.value = ""; // Reset
+            updateActiveFilters();
+            applyCombinedFiltersAndSearch();
         }
     });
 }
 
-// Apply filters
-document.getElementById("applyFiltersBtn").addEventListener("click", () => {
-    const skill = document.getElementById("skillFilter").value;
-    const sportsCategory = document.getElementById("sportsCategoryFilter").value;
-    const city = document.getElementById("cityFilter").value;
-    const area = document.getElementById("areaFilter").value;
+// Show filter tags (pills)
+function updateActiveFilters() {
+    const activeFiltersContainer = document.getElementById("activeFilters");
+    activeFiltersContainer.innerHTML = "";
 
-    if (currentSection === "attending") {
-        // Filter Attending Events
-        const attendingEvents = events.filter(event => event.status === "attending");
-        const filteredAttending = attendingEvents.filter(event => {
-            return (
-                (!skill || event.skillLevel === skill) &&
-                (!sportsCategory || event.sportCategory === sportsCategory) &&
-                (!city || event.city === city) &&
-                (!area || event.area === area)
-            );
+    Object.entries(selectedFilters).forEach(([key, values]) => {
+        values.forEach(value => {
+            const pill = document.createElement("div");
+            pill.classList.add("filter-pill");
+            pill.textContent = value;
+            pill.addEventListener("click", () => {
+                selectedFilters[key] = selectedFilters[key].filter(v => v !== value);
+                updateActiveFilters();
+                applyCombinedFiltersAndSearch();
+            });
+            activeFiltersContainer.appendChild(pill);
         });
+    });
+}
 
-        // Filter Not Attending Events
-        const notAttendingEvents = events.filter(event => event.status === "not attending");
-        const filteredNotAttending = notAttendingEvents.filter(event => {
-            return (
-                (!skill || event.skillLevel === skill) &&
-                (!sportsCategory || event.sportCategory === sportsCategory) &&
-                (!city || event.city === city) &&
-                (!area || event.area === area)
-            );
-        });
-
-        // Update both sections
-        updateEventList(filteredAttending, "attendingWrapper");
-        updateEventList(filteredNotAttending, "canceledWrapper");
-    } else {
-        // Filter Events for other sections
-        const filteredEvents = events.filter(event => {
-            return (
-                (!skill || event.skillLevel === skill) &&
-                (!sportsCategory || event.sportCategory === sportsCategory) &&
-                (!city || event.city === city) &&
-                (!area || event.area === area)
-            );
-        });
-
-        updateEventList(filteredEvents, "eventsWrapper");
+// UI update helper
+function updateFilteredUI(filtered) {
+    if (currentSection === "events" || currentSection === "my-events") {
+        updateEventList(filtered, "eventsWrapper");
+    } else if (currentSection === "attending") {
+        const attending = filtered.filter(e => e.status === "attending");
+        const canceled = filtered.filter(e => e.status === "not attending");
+        updateEventList(attending, "attendingWrapper");
+        updateEventList(canceled, "canceledWrapper");
     }
-});
+}
 
-// Populate filters on page load
+// Initialize filters on load
 populateFilters();
+setupMultiSelect("skillFilter", "skill");
+setupMultiSelect("sportsCategoryFilter", "sportsCategory");
+setupMultiSelect("cityFilter", "city");
+setupMultiSelect("areaFilter", "area");
 
-// Reset filters
-document.getElementById("resetFiltersBtn").addEventListener("click", () => {
-    // Reset all dropdowns to their default value
-    document.getElementById("skillFilter").value = "";
-    document.getElementById("sportsCategoryFilter").value = "";
-    document.getElementById("cityFilter").value = "";
-    document.getElementById("areaFilter").value = "";
+// Firestore Event Fetch
+fetchEvents();
 
-    // Clear active filters
-    updateActiveFilters();
-
-    // Reset the event list to show all events
-    updateEventList(events, "eventsWrapper");
-});
-
-
-
-    // **Fetch Events on Load**//
-    fetchEvents();
 });
