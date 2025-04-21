@@ -33,6 +33,12 @@
 | Hosting     | Firebase Hosting |
 | UI Style    | Glassmorphism, Responsive Design |
 
-## To Run
--Open the Login.html in Codes Folder with live server in VScode.
-
+### 🚀 How to Run the Project
+1. **Open the project** in **VS Code**.
+2. **Install the Live Server extension** (if not already installed):
+   - Go to the **Extensions** tab (or press `Ctrl+Shift+X`).
+   - Search for **"Live Server"** by *Ritwick Dey*.
+   - Click **Install**.
+3. Navigate to the `Codes` folder.
+4. Right-click on `Login.html` and select **"Open with Live Server"**.
+5. The project will open in your default web browser.
