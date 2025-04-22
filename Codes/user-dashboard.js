@@ -924,11 +924,7 @@ function toggleRightSectionElements(section) {
         filterInput.style.display = "none";
         filterTitle.style.display = "none";
         filtersContainer.style.display = "none";
-    } else if (["sports", "cities", "areas"].includes(section)) {
-        // Hide only filters and filter title in admin list sections
-        filterTitle.style.display = "none";
-        filtersContainer.style.display = "none";
-    }
+    } 
 }
 // Firestore Event Fetch
 fetchEvents();
