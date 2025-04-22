@@ -519,6 +519,32 @@ body {
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
 }
+.completed-event {
+    background-color: #e0e0e0 !important;
+    color: #777 !important;
+    opacity: 0.8;
+}
+.completed-event h2,
+.completed-event p,
+.completed-event .pill,
+.completed-event .location {
+    color: #555 !important;
+}
+.completed-banner {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    background-color: #d1d1d1;
+    color: #444;
+    font-weight: bold;
+    border-radius: 0 0 20px 20px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+}
+
+
 
 
 /* Right Section */

@@ -358,6 +358,8 @@ document.addEventListener("DOMContentLoaded", () => {
                `;
        
                document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
+               const now = new Date().toISOString().slice(0, 16);
+               document.getElementById("eventDateTime").setAttribute("min", now);
        
                // Animate form appearance
                setTimeout(() => {
@@ -457,6 +459,8 @@ document.addEventListener("DOMContentLoaded", () => {
                `;
            
                document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
+               const now = new Date().toISOString().slice(0, 16);
+               document.getElementById("eventDateTime").setAttribute("min", now);
            
                // Animate form appearance
                setTimeout(() => {

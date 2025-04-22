@@ -357,6 +357,8 @@ function showEditEventForm(event) {
         `;
 
         document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
+        const now = new Date().toISOString().slice(0, 16);
+        document.getElementById("eventDateTime").setAttribute("min", now);
 
         // Animate form appearance
         setTimeout(() => {
@@ -456,6 +458,8 @@ function showEditEventForm(event) {
         `;
     
         document.getElementById("eventsWrapper").insertAdjacentHTML("afterbegin", formHTML);
+        const now = new Date().toISOString().slice(0, 16);
+        document.getElementById("eventDateTime").setAttribute("min", now);
     
         // Animate form appearance
         setTimeout(() => {
