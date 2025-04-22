@@ -573,6 +573,7 @@ document.addEventListener("DOMContentLoaded", () => {
                    default:
                        middleSection.innerHTML = `<h2>Coming Soon</h2>`;
                }
+               toggleRightSectionElements(section);
            }
         
        
@@ -904,6 +905,31 @@ setupMultiSelect("sportsCategoryFilter", "sportsCategory");
 setupMultiSelect("cityFilter", "city");
 setupMultiSelect("areaFilter", "area");
 
+const rightSection = document.querySelector('.right-section');
+const searchTitle = rightSection.querySelector('h2:nth-of-type(1)');
+const filterTitle = rightSection.querySelector('h2:nth-of-type(2)');
+const filterInput = document.getElementById("filterInput");
+const filtersContainer = document.getElementById("filtersContainer");
+
+function toggleRightSectionElements(section) {
+    // Show everything by default
+    searchTitle.style.display = "block";
+    filterInput.style.display = "block";
+    filterTitle.style.display = "block";
+    filtersContainer.style.display = "block";
+
+    if (section === "participants") {
+        // Hide only search and filters in participants
+        searchTitle.style.display = "none";
+        filterInput.style.display = "none";
+        filterTitle.style.display = "none";
+        filtersContainer.style.display = "none";
+    } else if (["sports", "cities", "areas"].includes(section)) {
+        // Hide only filters and filter title in admin list sections
+        filterTitle.style.display = "none";
+        filtersContainer.style.display = "none";
+    }
+}
 // Firestore Event Fetch
 fetchEvents();
 });

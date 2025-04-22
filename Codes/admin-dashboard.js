@@ -582,6 +582,7 @@ function showEditEventForm(event) {
             default:
                 middleSection.innerHTML = `<h2>Coming Soon</h2>`;
         }
+        toggleRightSectionElements(section);
     }
     
     // Handle sidebar navigation clicks
@@ -933,33 +934,50 @@ function applyCombinedFiltersAndSearch() {
         }
     }
     else if (["sports", "cities", "areas"].includes(currentSection)) {
-    const adminListItems = Array.from(document.querySelectorAll(".admin-item span"));
-    let matchFound = false;
-
-    adminListItems.forEach(item => {
-        const parent = item.parentElement;
-        if ((item.textContent || "").toLowerCase().includes(query)) {
-            parent.style.display = "block";
-            matchFound = true;
-        } else {
-            parent.style.display = "none";
+        const adminListItems = Array.from(document.querySelectorAll(".admin-item"));
+        const letterHeadings = Array.from(document.querySelectorAll(".letter-heading"));
+        let matchFound = false;
+    
+        // Hide all items and letter headings
+        adminListItems.forEach(item => item.style.display = "none");
+        letterHeadings.forEach(heading => heading.style.display = "none");
+    
+        const queryLower = query.toLowerCase();
+    
+        // First, filter and show matching items
+        adminListItems.forEach(item => {
+            const span = item.querySelector("span");
+            if (span && span.textContent.toLowerCase().includes(queryLower)) {
+                item.style.display = "flex";
+                matchFound = true;
+            }
+        });
+    
+        // Now show letter headings that have at least one visible item after them
+        letterHeadings.forEach(heading => {
+            let next = heading.nextElementSibling;
+            while (next && next.classList.contains("admin-item")) {
+                if (next.style.display !== "none") {
+                    heading.style.display = "block";
+                    break;
+                }
+                next = next.nextElementSibling;
+            }
+        });
+    
+        // Handle no match message
+        document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
+    
+        if (!matchFound) {
+            const msg = document.createElement("p");
+            msg.className = "no-results-msg";
+            msg.textContent = `No ${currentSection} match your search.`;
+            msg.style.textAlign = "center";
+    
+            const listContainer = document.querySelector(".admin-list");
+            if (listContainer) listContainer.appendChild(msg);
         }
-    });
-
-    // Remove any previous no-result messages
-    document.querySelectorAll(".no-results-msg").forEach(el => el.remove());
-
-    if (!matchFound) {
-        const msg = document.createElement("p");
-        msg.className = "no-results-msg";
-        msg.textContent = `No ${currentSection} match your search.`;
-        msg.style.textAlign = "center";
-
-        const listContainer = document.querySelector(".admin-list");
-        if (listContainer) listContainer.appendChild(msg);
     }
-}
-
 }
 
 
@@ -1058,7 +1076,31 @@ setupMultiSelect("sportsCategoryFilter", "sportsCategory");
 setupMultiSelect("cityFilter", "city");
 setupMultiSelect("areaFilter", "area");
 
+const rightSection = document.querySelector('.right-section');
+const searchTitle = rightSection.querySelector('h2:nth-of-type(1)');
+const filterTitle = rightSection.querySelector('h2:nth-of-type(2)');
+const filterInput = document.getElementById("filterInput");
+const filtersContainer = document.getElementById("filtersContainer");
 
+function toggleRightSectionElements(section) {
+    // Show everything by default
+    searchTitle.style.display = "block";
+    filterInput.style.display = "block";
+    filterTitle.style.display = "block";
+    filtersContainer.style.display = "block";
+
+    if (section === "participants") {
+        // Hide only search and filters in participants
+        searchTitle.style.display = "none";
+        filterInput.style.display = "none";
+        filterTitle.style.display = "none";
+        filtersContainer.style.display = "none";
+    } else if (["sports", "cities", "areas"].includes(section)) {
+        // Hide only filters and filter title in admin list sections
+        filterTitle.style.display = "none";
+        filtersContainer.style.display = "none";
+    }
+}
 // Firestore Event Fetch
 fetchEvents();
 
