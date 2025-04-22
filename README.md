@@ -39,6 +39,8 @@
    - Go to the **Extensions** tab (or press `Ctrl+Shift+X`).
    - Search for **"Live Server"** by *Ritwick Dey*.
    - Click **Install**.
-3. Navigate to the `Codes` folder.
-4. Right-click on `Login.html` and select **"Open with Live Server"**.
+3. Navigate to the `index.html` file.
+4. Right-click on file and select **"Open with Live Server"**.
 5. The project will open in your default web browser.
+**OR**
+Open Link: **https://lithishc.github.io/Sports-Buddy/**
