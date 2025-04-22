@@ -42,5 +42,5 @@
 3. Navigate to the `index.html` file.
 4. Right-click on file and select **"Open with Live Server"**.
 5. The project will open in your default web browser.
-## OR
+### OR
 Open Link: **https://lithishc.github.io/Sports-Buddy/**
